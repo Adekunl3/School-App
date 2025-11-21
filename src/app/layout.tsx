@@ -7,6 +7,15 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "School Management Dashboard",
   description: "School Management System",
+  // icons: {
+  //   // Update these paths with your actual files placed in `public/`.
+  //   icon: [
+  //     { url: "/teacher.png", sizes: "32x32", type: "image/png" },
+  //     { url: "/teacher.png", sizes: "16x16", type: "image/png" },
+  //   ],
+  //   shortcut: "/favicon-school.ico",
+  //   apple: "/apple-touch-icon.png",
+  // },
 };
 
 export default function RootLayout({
