@@ -50,7 +50,7 @@ const SignInPage = () => {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-semibold mb-2">Sign in to your account</h1>
         <p className="text-sm text-slate-500 mb-6">Demo sign-in — use any credentials to continue.</p>

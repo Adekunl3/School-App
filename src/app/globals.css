@@ -106,3 +106,70 @@
   color: gray !important;
   margin-bottom: 5px;
 }
+
+/* Dark mode styles */
+html.dark {
+  background-color: #1a202c; /* Dark background */
+  color: #e2e8f0; /* Light text */
+}
+
+button.dark {
+  background-color: #2d3748; /* Dark button background */
+  color: #e2e8f0; /* Light button text */
+}
+
+/* Global dark mode styles */
+html.dark {
+  background-color: #1a202c; /* Dark background */
+  color: #e2e8f0; /* Light text */
+}
+
+body.dark {
+  background-color: #1a202c; /* Ensure body matches html */
+  color: #e2e8f0;
+}
+
+/* Example for links */
+a {
+  color: #3182ce; /* Default link color */
+}
+html.dark a {
+  color: #63b3ed; /* Light blue for dark mode */
+}
+
+/* Dark mode styles for react-calendar */
+html.dark .react-calendar {
+  background-color: #1f2937; /* Dark background */
+  color: #e2e8f0; /* Light text */
+  border: 1px solid #374151; /* Dark border */
+}
+
+html.dark .react-calendar__tile {
+  background-color: #374151; /* Tile background */
+  color: #e2e8f0; /* Tile text */
+}
+
+html.dark .react-calendar__tile--active {
+  background-color: #4b5563; /* Active tile background */
+  color: #e2e8f0; /* Active tile text */
+}
+
+/* Ensure text remains visible on hover in dark mode */
+html.dark .react-calendar__tile:hover {
+  background-color: #4b5563; /* Neutral dark hover background */
+  color: #ffffff; /* Bright white text for better visibility */
+}
+
+html.dark .rbc-event:hover {
+  background-color: #2d3748; /* Slightly lighter dark background */
+  color: #ffffff; /* Bright white text */
+}
+
+html.dark button:hover {
+  background-color: #374151; /* Dark hover for buttons */
+  color: #ffffff; /* Bright white text */
+}
+
+html.dark a:hover {
+  color: #63b3ed; /* Brighter blue for links */
+}
