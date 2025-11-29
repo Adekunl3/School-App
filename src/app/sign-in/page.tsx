@@ -10,6 +10,7 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [checkingAuth, setCheckingAuth] = useState(true); // Added to prevent brief rendering
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,22 +33,29 @@ const SignInPage = () => {
 
     // Demo behaviour: accept any credentials, persist a demo token, and redirect to admin
     try {
-      localStorage.setItem("auth", "demo-token");
+      localStorage.setItem("auth", "demo-token"); // Store demo token
     } catch (err) {
-      // ignore localStorage errors in unusual environments
+      // Ignore localStorage errors in unusual environments
     }
     router.replace("/admin");
   };
 
-  // If already signed in (demo token present), redirect immediately to admin
   useEffect(() => {
     try {
       const t = localStorage.getItem("auth");
-      if (t) router.replace("/admin");
+      if (t) {
+        router.replace("/admin"); // Redirect if token exists
+      } else {
+        setCheckingAuth(false); // Allow rendering if no token is found
+      }
     } catch (err) {
-      /* ignore */
+      setCheckingAuth(false); // Allow rendering in case of error
     }
   }, [router]);
+
+  if (checkingAuth) {
+    return <div>Loading...</div>; // Prevent rendering the sign-in page
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">

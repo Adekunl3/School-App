@@ -32,7 +32,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <button
           onClick={toggleTheme}
-          className="fixed top-4 right-4 p-2 bg-gray-200 dark:bg-gray-800 rounded"
+          className="fixed top-4 right-56 p-2 bg-gray-200 dark:bg-gray-800 rounded-lg"
         >
           Toggle {theme === "light" ? "Dark" : "Light"} Mode
         </button>

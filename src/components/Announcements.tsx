@@ -20,14 +20,14 @@ const Announcements = () => {
         </div>
         <div className="bg-lamaPurpleLight rounded-md p-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-medium">Lorem ipsum dolor sit</h2>
+            <h2 className="font-medium">Everyone is welcome</h2>
             <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
               2025-01-01
             </span>
           </div>
           <p className="text-sm text-gray-400 mt-1">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum,
-            expedita. Rerum, quidem facilis?
+            
+            stay Exicted!
           </p>
         </div>
         <div className="bg-lamaYellowLight rounded-md p-4">
@@ -38,8 +38,7 @@ const Announcements = () => {
             </span>
           </div>
           <p className="text-sm text-gray-400 mt-1">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatum,
-            expedita. Rerum, quidem facilis?
+            Hooray! it is 20th Aniversarry Tomorrow
           </p>
         </div>
       </div>
