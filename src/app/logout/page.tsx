@@ -8,7 +8,7 @@ export default function LogoutPage() {
 
   useEffect(() => {
     try {
-      localStorage.removeItem("auth");
+      localStorage.removeItem("accessToken");
     } catch (err) {
       // ignore
     }
