@@ -20,9 +20,9 @@ app.get('/', (req, res) => {
 const routes = require('./routes/index');
 const authRoutes = require('./routes/auth');
 const studentRoutes = require('./routes/students');
-app.use('/', routes);
-app.use('/Login', authRoutes);
-app.use('/students', studentRoutes);
+app.use('/api/v1', routes);
+app.use('/api/v1/Login', authRoutes);
+app.use('/api/v1/students', studentRoutes);
 
 // Error handling middleware
 const errorHandler = require('./middlewares/errorHandler');

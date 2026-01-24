@@ -28,11 +28,15 @@ This is the backend for the School App, built with Express.js.
 
 ## API Endpoints
 
-- `GET /` - Welcome message
-- `GET /api/test` - Test API
+All endpoints are prefixed with `/api/v1/`.
 
-## Authentication
-
-The API uses JWT for authentication. Include the token in the Authorization header as `Bearer <token>`.
-
-For refresh token, use `POST /Login/RefreshToken`.
+- `GET /api/v1/` - Welcome message
+- `GET /api/v1/health` - Health check
+- `GET /api/v1/test` - Test API
+- `POST /api/v1/Login/login` - User login
+- `POST /api/v1/Login/refresh` - Refresh access token
+- `GET /api/v1/students` - Get all students (protected)
+- `GET /api/v1/students/:id` - Get student by ID (protected)
+- `POST /api/v1/students` - Create student (admin only)
+- `PUT /api/v1/students/:id` - Update student (admin only)
+- `DELETE /api/v1/students/:id` - Delete student (admin only)
