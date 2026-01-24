@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,9 +18,13 @@ app.get('/', (req, res) => {
 
 // Routes
 const routes = require('./routes/index');
+const authRoutes = require('./routes/auth');
+const studentRoutes = require('./routes/students');
 app.use('/', routes);
+app.use('/Login', authRoutes);
+app.use('/students', studentRoutes);
 
-// TODO: Add routes for students, teachers, etc.
+// TODO: Add routes for teachers, etc.
 
 // Start server
 app.listen(PORT, () => {
