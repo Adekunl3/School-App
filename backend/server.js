@@ -24,6 +24,10 @@ app.use('/', routes);
 app.use('/Login', authRoutes);
 app.use('/students', studentRoutes);
 
+// Error handling middleware
+const errorHandler = require('./middlewares/errorHandler');
+app.use(errorHandler);
+
 // TODO: Add routes for teachers, etc.
 
 // Start server
