@@ -26,6 +26,19 @@ This is the backend for the School App, built with Express.js.
    npm run dev
    ```
 
+## Authentication
+
+The API uses JWT for authentication with role-based access control (RBAC). Include the token in the Authorization header as `Bearer <token>`.
+
+### Login Credentials (Demo)
+
+- **Admin**: username: `admin`, password: `admin123`
+- **Teacher**: username: `teacher`, password: `teacher123`
+- **Parent**: username: `parent`, password: `parent123`
+- **Student**: username: `student`, password: `student123`
+
+For refresh token, use `POST /api/v1/Login/refresh`.
+
 ## API Endpoints
 
 All endpoints are prefixed with `/api/v1/`.

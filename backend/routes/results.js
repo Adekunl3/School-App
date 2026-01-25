@@ -5,7 +5,7 @@ import { authenticateToken, authorizeRole } from '../middlewares/auth.js';
 const router = express.Router();
 
 // GET all results - protected
-router.get('/', authenticateToken, authorizeRole(['admin', 'teacher']), getAllResults);
+router.get('/', authenticateToken, authorizeRole(['admin', 'teacher', 'student', 'parent']), getAllResults);
 
 // GET result by id - protected
 router.get('/:id', authenticateToken, authorizeRole(['admin', 'teacher']), getResultById);
