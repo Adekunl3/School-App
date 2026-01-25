@@ -53,7 +53,7 @@ const deleteStudent = (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getAllStudents,
   getStudentById,
   createStudent,

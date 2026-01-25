@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
 // Example route
@@ -11,4 +12,4 @@ router.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is healthy', timestamp: new Date().toISOString() });
 });
 
-module.exports = router;
+export default router;

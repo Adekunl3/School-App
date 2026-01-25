@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 // Mock user for demo
 const mockUser = {
@@ -31,7 +31,7 @@ const refreshToken = (req, res) => {
   }
 };
 
-module.exports = {
+export {
   login,
   refreshToken
 };

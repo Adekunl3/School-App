@@ -1,6 +1,7 @@
-const express = require('express');
-const { getAllStudents, getStudentById, createStudent, updateStudent, deleteStudent } = require('../controllers/studentController');
-const { authenticateToken, authorizeRole } = require('../middlewares/auth');
+import express from 'express';
+import { getAllStudents, getStudentById, createStudent, updateStudent, deleteStudent } from '../controllers/studentController.js';
+import { authenticateToken, authorizeRole } from '../middlewares/auth.js';
+
 const router = express.Router();
 
 // GET all students - protected
@@ -18,4 +19,4 @@ router.put('/:id', authenticateToken, authorizeRole(['admin']), updateStudent);
 // DELETE student - admin only
 router.delete('/:id', authenticateToken, authorizeRole(['admin']), deleteStudent);
 
-module.exports = router;
+export default router;
