@@ -10,6 +10,11 @@ import parentRoutes from './routes/parents.js';
 import subjectRoutes from './routes/subjects.js';
 import classRoutes from './routes/classes.js';
 import announcementRoutes from './routes/announcements.js';
+import assignmentRoutes from './routes/assignments.js';
+import eventRoutes from './routes/events.js';
+import examRoutes from './routes/exams.js';
+import lessonRoutes from './routes/lessons.js';
+import resultRoutes from './routes/results.js';
 import errorHandler from './middlewares/errorHandler.js';
 
 dotenv.config();
@@ -36,6 +41,11 @@ app.use('/api/v1/parents', parentRoutes);
 app.use('/api/v1/subjects', subjectRoutes);
 app.use('/api/v1/classes', classRoutes);
 app.use('/api/v1/announcements', announcementRoutes);
+app.use('/api/v1/assignments', assignmentRoutes);
+app.use('/api/v1/events', eventRoutes);
+app.use('/api/v1/exams', examRoutes);
+app.use('/api/v1/lessons', lessonRoutes);
+app.use('/api/v1/results', resultRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
