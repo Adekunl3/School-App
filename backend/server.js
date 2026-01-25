@@ -5,6 +5,11 @@ import dotenv from 'dotenv';
 import routes from './routes/index.js';
 import authRoutes from './routes/auth.js';
 import studentRoutes from './routes/students.js';
+import teacherRoutes from './routes/teachers.js';
+import parentRoutes from './routes/parents.js';
+import subjectRoutes from './routes/subjects.js';
+import classRoutes from './routes/classes.js';
+import announcementRoutes from './routes/announcements.js';
 import errorHandler from './middlewares/errorHandler.js';
 
 dotenv.config();
@@ -26,6 +31,11 @@ app.get('/', (req, res) => {
 app.use('/api/v1', routes);
 app.use('/api/v1/Login', authRoutes);
 app.use('/api/v1/students', studentRoutes);
+app.use('/api/v1/teachers', teacherRoutes);
+app.use('/api/v1/parents', parentRoutes);
+app.use('/api/v1/subjects', subjectRoutes);
+app.use('/api/v1/classes', classRoutes);
+app.use('/api/v1/announcements', announcementRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
