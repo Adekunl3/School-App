@@ -16,11 +16,25 @@ const SignInPage = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const[persistToast, setPersistToast]= useState(false);
 
-  const showPersistentToast = (message: string) => {
-  // Store first, then show
-  sessionStorage.setItem('persistentToast', message);
+//   const showPersistentToast = (message: string) => {
+//   // Store first, then show
+//   localStorage.setItem('persistentToast', message);
+//   toast.error(message, { duration: 8000 });
+// };
+
+const showPersistentToast = (message: string) => {
+  localStorage.setItem("persistentToast", message);
   toast.error(message, { duration: 8000 });
 };
+
+useEffect(() => {
+  const savedToast = localStorage.getItem("persistentToast");
+  if (savedToast) {
+    toast.error(savedToast, { duration: 8000 });
+    localStorage.removeItem("persistentToast");
+  }
+}, []);
+
 
   // Auth check - runs once on mount
   useEffect(() => {
@@ -62,10 +76,10 @@ const SignInPage = () => {
 
       // Check API response status
       if (response.data.message === "Success") {
-        const { accessToken, refreshToken, userId, userName } = response.data;
+        const { jwtToken, refreshToken, userId, userName } = response.data;
 
         // Store tokens
-        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("accessToken", jwtToken);
         localStorage.setItem("refreshToken", refreshToken);
 
       const userData = parseUserData(response.data);
