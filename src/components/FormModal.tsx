@@ -18,6 +18,9 @@ const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
 const StudentForm = dynamic(() => import("./forms/StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+const ParentForm = dynamic(() => import("./forms/ParentForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
 const forms: {
   [key: string]: (
@@ -29,7 +32,8 @@ const forms: {
   teacher: (type, data, onSuccess) => (
     <TeacherForm type={type} data={data} onSuccess={onSuccess} />
   ),
-  student: (type, data) => <StudentForm type={type} data={data} />,
+  student: (type, data, onSuccess) => <StudentForm type={type} data={data} />,
+  parent: (type, data, onSuccess) => <ParentForm type={type} data={data}  />,
 };
 
 const FormModal = ({
