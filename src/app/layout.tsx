@@ -2,6 +2,7 @@
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+// @ts-ignore: CSS global import type declarations not available in this project setup
 import "./globals.css";
 import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";

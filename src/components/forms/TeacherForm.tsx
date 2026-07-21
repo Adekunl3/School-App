@@ -2,53 +2,95 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 import InputField from "../InputField";
-import Image from "next/image";
+import { api } from "@/lib/api";
+import { endpoints } from "@/utils/apiEndPoints";
+import toast from "react-hot-toast";
 
-const schema = z.object({
+const createSchema = z.object({
   username: z
     .string()
     .min(3, { message: "Username must be at least 3 characters long!" })
-    .max(20, { message: "Username must be at most 20 characters long!" }),
+    .max(50, { message: "Username must be at most 50 characters long!" }),
   email: z.string().email({ message: "Invalid email address!" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters long!" }),
+    .min(6, { message: "Password must be at least 6 characters long!" }),
   firstName: z.string().min(1, { message: "First name is required!" }),
   lastName: z.string().min(1, { message: "Last name is required!" }),
-  phone: z.string().min(1, { message: "Phone is required!" }),
-  address: z.string().min(1, { message: "Address is required!" }),
-  bloodType: z.string().min(1, { message: "Blood Type is required!" }),
-  birthday: z.date({ message: "Birthday is required!" }),
-  sex: z.enum(["male", "female"], { message: "Sex is required!" }),
-  img: z.instanceof(File, { message: "Image is required" }),
 });
 
-type Inputs = z.infer<typeof schema>;
+const updateSchema = createSchema.extend({
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters long!" })
+    .optional()
+    .or(z.literal("")),
+});
+
+type Inputs = z.infer<typeof createSchema>;
 
 const TeacherForm = ({
   type,
   data,
+  onSuccess,
 }: {
   type: "create" | "update";
   data?: any;
+  onSuccess?: () => void;
 }) => {
+  const [submitting, setSubmitting] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(type === "create" ? createSchema : updateSchema),
+    defaultValues: {
+      username: data?.username,
+      email: data?.email,
+      firstName: data?.firstName,
+      lastName: data?.lastName,
+    },
   });
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const onSubmit = handleSubmit(async (formData) => {
+    setSubmitting(true);
+    try {
+      if (type === "create") {
+        await api.post(endpoints.teachers, formData);
+        toast.success("Teacher created successfully!");
+      } else {
+        const payload: Record<string, unknown> = {
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        };
+        if (formData.password) {
+          payload.password = formData.password;
+        }
+        await api.put(endpoints.teacher(data.id), payload);
+        toast.success("Teacher updated successfully!");
+      }
+      onSuccess?.();
+    } catch (err: any) {
+      const message =
+        err.response?.data?.title ||
+        err.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
+    }
   });
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">Create a new teacher</h1>
+      <h1 className="text-xl font-semibold">
+        {type === "create" ? "Create a new teacher" : "Update teacher"}
+      </h1>
       <span className="text-xs text-gray-400 font-medium">
         Authentication Information
       </span>
@@ -59,6 +101,7 @@ const TeacherForm = ({
           defaultValue={data?.username}
           register={register}
           error={errors?.username}
+          inputProps={{ disabled: type === "update" }}
         />
         <InputField
           label="Email"
@@ -71,9 +114,13 @@ const TeacherForm = ({
           label="Password"
           name="password"
           type="password"
-          defaultValue={data?.password}
+          defaultValue=""
           register={register}
           error={errors?.password}
+          inputProps={{
+            placeholder:
+              type === "update" ? "Leave blank to keep current password" : "",
+          }}
         />
       </div>
       <span className="text-xs text-gray-400 font-medium">
@@ -94,69 +141,18 @@ const TeacherForm = ({
           register={register}
           error={errors.lastName}
         />
-        <InputField
-          label="Phone"
-          name="phone"
-          defaultValue={data?.phone}
-          register={register}
-          error={errors.phone}
-        />
-        <InputField
-          label="Address"
-          name="address"
-          defaultValue={data?.address}
-          register={register}
-          error={errors.address}
-        />
-        <InputField
-          label="Blood Type"
-          name="bloodType"
-          defaultValue={data?.bloodType}
-          register={register}
-          error={errors.bloodType}
-        />
-        <InputField
-          label="Birthday"
-          name="birthday"
-          defaultValue={data?.birthday}
-          register={register}
-          error={errors.birthday}
-          type="date"
-        />
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("sex")}
-            defaultValue={data?.sex}
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          {errors.sex?.message && (
-            <p className="text-xs text-red-400">
-              {errors.sex.message.toString()}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
-          <label
-            className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
-            htmlFor="img"
-          >
-            <Image src="/upload.png" alt="" width={28} height={28} />
-            <span>Upload a photo</span>
-          </label>
-          <input type="file" id="img" {...register("img")} className="hidden" />
-          {errors.img?.message && (
-            <p className="text-xs text-red-400">
-              {errors.img.message.toString()}
-            </p>
-          )}
-        </div>
       </div>
-      <button className="bg-blue-400 text-white p-2 rounded-md">
-        {type === "create" ? "Create" : "Update"}
+      <button
+        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
+        disabled={submitting}
+      >
+        {submitting
+          ? type === "create"
+            ? "Creating..."
+            : "Updating..."
+          : type === "create"
+          ? "Create"
+          : "Update"}
       </button>
     </form>
   );

@@ -23,11 +23,10 @@ import { API_BASE_URL, TOKEN } from "@/lib/api";
 
 
 export const endpoints = {
-  payments: `/GetPayments/${TOKEN}`,
-  students: `/GetPurchaseOrders/${TOKEN}`,
-    purchaseOrders: (token: string) => `/GetPurchaseOrders/${token}`,
-
-//   teachers: `/GetPayments/${TOKEN}`,
+  students: `/Teachers`,
+  login: `/Auth/login`,
+  teachers: `/Teachers`,
+  teacher: (id: string) => `/Teachers/${id}`,
 //   parents: `/GetPayments/${TOKEN}`,
 //   staff: `/GetPayments/${TOKEN}`,
 };

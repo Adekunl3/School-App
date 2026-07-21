@@ -4,7 +4,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { api, TOKEN } from "@/lib/api";
+import { api } from "@/lib/api";
+import { endpoints } from "@/utils/apiEndPoints";
 import toast from "react-hot-toast";
 import { parseUserData, storeUserData } from "@/utils/userUtils";
 
@@ -24,13 +25,13 @@ const SignInPage = () => {
 
 const showPersistentToast = (message: string) => {
   localStorage.setItem("persistentToast", message);
-  toast.error(message, { duration: 8000 });
+  toast.error(message, { duration: 1000 });
 };
 
 useEffect(() => {
   const savedToast = localStorage.getItem("persistentToast");
   if (savedToast) {
-    toast.error(savedToast, { duration: 8000 });
+    toast.error(savedToast, { duration: 1000 });
     localStorage.removeItem("persistentToast");
   }
 }, []);
@@ -69,24 +70,25 @@ useEffect(() => {
     setLoading(true);
 
     try {
-      const response = await api.post(`/Login/${TOKEN}`, { 
-        username: username.trim(), 
-        password: password.trim() 
+      const response = await api.post(endpoints.login, {
+        username: username.trim(),
+        password: password.trim(),
       });
 
       // Check API response status
-      if (response.data.message === "Success") {
-        const { jwtToken, refreshToken, userId, userName } = response.data;
+      // if (response.data.message === "Success") { previous endpoint structure
+      if (response.data) {
+        const { token, userId, username } = response.data;
 
         // Store tokens
-        localStorage.setItem("accessToken", jwtToken);
-        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("accessToken", token);
+        localStorage.setItem("refreshToken", token);
 
       const userData = parseUserData(response.data);
       storeUserData(userData);
       
       // Also store the raw userId for compatibility
-      localStorage.setItem("userId", response.data.userId);
+      localStorage.setItem("userId", username);
       
 
         toast.success("Login successful! Redirecting...", {
@@ -102,7 +104,7 @@ useEffect(() => {
         // API returned failure with custom message
         const apiErrorMessage = response.data.message || "Login failed. Please try again.";
         toast.error(apiErrorMessage, {
-          duration: 8000,
+          duration: 1000,
         });
         setLoading(false); // Reset loading state
       }

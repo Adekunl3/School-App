@@ -3,6 +3,9 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
+import { api } from "@/lib/api";
+import { endpoints } from "@/utils/apiEndPoints";
+import toast from "react-hot-toast";
 
 // USE LAZY LOADING
 
@@ -17,10 +20,16 @@ const StudentForm = dynamic(() => import("./forms/StudentForm"), {
 });
 
 const forms: {
-  [key: string]: (type: "create" | "update", data?: any) => JSX.Element;
+  [key: string]: (
+    type: "create" | "update",
+    data: any,
+    onSuccess: () => void
+  ) => JSX.Element;
 } = {
-  teacher: (type, data) => <TeacherForm type={type} data={data} />,
-  student: (type, data) => <StudentForm type={type} data={data} />
+  teacher: (type, data, onSuccess) => (
+    <TeacherForm type={type} data={data} onSuccess={onSuccess} />
+  ),
+  student: (type, data) => <StudentForm type={type} data={data} />,
 };
 
 const FormModal = ({
@@ -28,6 +37,7 @@ const FormModal = ({
   type,
   data,
   id,
+  onSuccess,
 }: {
   table:
     | "teacher"
@@ -44,7 +54,8 @@ const FormModal = ({
     | "announcement";
   type: "create" | "update" | "delete";
   data?: any;
-  id?: number;
+  id?: number | string;
+  onSuccess?: () => void;
 }) => {
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
   const bgColor =
@@ -55,19 +66,55 @@ const FormModal = ({
       : "bg-lamaPurple";
 
   const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+    onSuccess?.();
+  };
+
+  const handleDelete = async () => {
+    if (!id) return;
+    setDeleting(true);
+    try {
+      if (table === "teacher") {
+        await api.delete(endpoints.teacher(String(id)));
+        toast.success("Teacher deleted successfully!");
+      }
+      handleClose();
+    } catch (err: any) {
+      const message =
+        err.response?.data?.title ||
+        err.response?.data?.message ||
+        "Failed to delete. Please try again.";
+      toast.error(message);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const Form = () => {
     return type === "delete" && id ? (
-      <form action="" className="p-4 flex flex-col gap-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleDelete();
+        }}
+        className="p-4 flex flex-col gap-4"
+      >
         <span className="text-center font-medium">
           All data will be lost. Are you sure you want to delete this {table}?
         </span>
-        <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center">
-          Delete
+        <button
+          type="submit"
+          disabled={deleting}
+          className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center disabled:opacity-60"
+        >
+          {deleting ? "Deleting..." : "Delete"}
         </button>
       </form>
     ) : type === "create" || type === "update" ? (
-      forms[table](type, data)
+      forms[table](type, data, handleClose)
     ) : (
       "Form not found!"
     );

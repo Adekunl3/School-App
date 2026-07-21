@@ -93,15 +93,15 @@ export const getUserInitials = (userName: string): string => {
  */
 export interface UserData {
   userId: string;
-  userName: string;
+  username: string;
   role: string;
   initials: string;
   company?: string;
 }
 
 export const parseUserData = (apiResponse: any): UserData => {
-  const userId = apiResponse?.userId || apiResponse?.data?.userId || '';
-  const userName = apiResponse?.userName || apiResponse?.data?.userName || '';
+  const userId = apiResponse?.email || apiResponse?.data?.username || '';
+  const userName = apiResponse?.username || apiResponse?.data?.username || '';
   
   const displayName = formatUserName(userId);
   const role = extractRoleFromUserId(userId);
@@ -112,7 +112,7 @@ export const parseUserData = (apiResponse: any): UserData => {
   
   return {
     userId,
-    userName: userName || displayName,
+    username: userName || displayName,
     role,
     initials,
     company
@@ -126,7 +126,7 @@ export const parseUserData = (apiResponse: any): UserData => {
 export const storeUserData = (userData: UserData): void => {
   try {
     localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('userId', userData.userId);
+    localStorage.setItem('userId', userData.username);
   } catch (error) {
     console.error('Failed to store user data:', error);
   }

@@ -27,6 +27,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { api, TOKEN } from "@/lib/api";
 import { toast } from "react-hot-toast";
+import { endpoints } from "@/utils/apiEndPoints";
 
 const UserCard = ({ type }: { type: string }) => {
   const [totalCount, setTotalCount] = useState(0);
@@ -37,10 +38,14 @@ const UserCard = ({ type }: { type: string }) => {
       setLoading(true);
 
       try {
-        const response = await api.get(`/GetPurchaseOrders/${TOKEN}`);
+        // const response = await api.get(`/GetPurchaseOrders/${TOKEN}`);
+              // const response = await api.post(endpoints.login, {
 
-        if (response.data.message === "Success") {
-          const count = response.data?.metadata?.totalCount ?? 0;
+        const response = await api.get(endpoints.teachers);
+
+        if (response.data) {
+          // const count = response.data?.metadata?.totalCount ?? 0;
+          const count = response.data?.length ?? 0;
           setTotalCount(count);
 
           toast.success("Loaded successfully", { duration: 3000 });
