@@ -1,118 +1,89 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { role } from "@/lib/data";
-import { api } from "@/lib/api";
-import { endpoints } from "@/utils/apiEndPoints";
+import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import FormModal from "@/components/FormModal";
+import ListPageShell, { type ListColumn } from "@/components/ListPageShell";
+import { useList } from "@/hooks/useList";
+import { formatDate } from "@/lib/formHelpers";
+import { useIsAdmin } from "@/hooks/useRole";
+import { teacherService } from "@/services/school";
+import type { Teacher } from "@/types/school";
 
-type Teacher = {
-  id: string;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  createdAt: string;
-};
-
-const columns = [
+const columns: ListColumn[] = [
+  { header: "Info", accessor: "info", sortProperty: "LastName" },
   {
-    header: "Info",
-    accessor: "info",
-  },
-  {
-    header: "Username",
-    accessor: "username",
+    header: "Teacher ID",
+    accessor: "teacherId",
     className: "hidden md:table-cell",
+    sortProperty: "TeacherId",
   },
-  {
-    header: "Email",
-    accessor: "email",
-    className: "hidden md:table-cell",
-  },
+  { header: "Email", accessor: "email", className: "hidden lg:table-cell" },
+  { header: "Phone", accessor: "phone", className: "hidden lg:table-cell" },
   {
     header: "Joined",
-    accessor: "createdAt",
-    className: "hidden lg:table-cell",
+    accessor: "hireDate",
+    className: "hidden xl:table-cell",
+    sortProperty: "HireDate",
   },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
+  { header: "Actions", accessor: "action" },
 ];
 
 const TeacherListPage = () => {
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [loading, setLoading] = useState(true);
+  const isAdmin = useIsAdmin();
 
-  const fetchTeachers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await api.get(endpoints.teachers);
-      setTeachers(res.data ?? []);
-    } catch (err) {
-      console.error("Failed to fetch teachers:", err);
-      toast.error("Failed to load teachers.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTeachers();
-  }, [fetchTeachers]);
+  const list = useList<Teacher>({
+    fetcher: useCallback((query) => teacherService.list(query), []),
+    itemsPerPage: 10,
+    initialSortProperty: "LastName",
+  });
 
   const renderRow = (item: Teacher) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-red-50 text-sm hover:bg-red-500  dark:even:bg-gray-700"
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
     >
       <td className="flex items-center gap-4 p-4">
         <Image
-          src="/avatar.png"
+          src={item.photo || "/avatar.png"}
           alt=""
           width={40}
           height={40}
           className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
+          // Remote photo URLs are arbitrary, so skip next/image optimisation
+          // rather than allow-listing every host in next.config.mjs.
+          unoptimized
         />
         <div className="flex flex-col">
-          <h3 className="font-semibold">
-            {item.firstName} {item.lastName}
-          </h3>
-          <p className="text-xs text-gray-500">{item.email}</p>
+          <h3 className="font-semibold">{item.name}</h3>
+          <p className="text-xs text-gray-500">{item.username || "No login"}</p>
         </div>
       </td>
-      <td className="hidden md:table-cell">{item.username}</td>
-      <td className="hidden md:table-cell">{item.email}</td>
-      <td className="hidden lg:table-cell">
-        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ""}
-      </td>
+      <td className="hidden md:table-cell">{item.teacherId}</td>
+      <td className="hidden lg:table-cell">{item.email || "-"}</td>
+      <td className="hidden lg:table-cell">{item.phone || "-"}</td>
+      <td className="hidden xl:table-cell">{formatDate(item.hireDate)}</td>
       <td>
         <div className="flex items-center gap-2">
-          <Link href={`/list/teachers/${item.id}`}>
+          <Link href={`/list/teachers/${item.teacherId}`}>
             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky">
-              <Image src="/view.png" alt="" width={16} height={16} />
+              <Image src="/view.png" alt="View" width={16} height={16} />
             </button>
           </Link>
-          {role === "admin" && (
+          {isAdmin && (
             <>
               <FormModal
                 table="teacher"
                 type="update"
                 data={item}
-                onSuccess={fetchTeachers}
+                onSuccess={list.refetch}
               />
               <FormModal
                 table="teacher"
                 type="delete"
-                id={item.id}
-                onSuccess={fetchTeachers}
+                id={item.teacherId}
+                onSuccess={list.refetch}
               />
             </>
           )}
@@ -122,34 +93,15 @@ const TeacherListPage = () => {
   );
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">All Teachers</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {role === "admin" && (
-              <FormModal table="teacher" type="create" onSuccess={fetchTeachers} />
-            )}
-          </div>
-        </div>
-      </div>
-      {/* LIST */}
-      {loading ? (
-        <p className="p-4 text-sm text-gray-500">Loading teachers...</p>
-      ) : (
-        <Table columns={columns} renderRow={renderRow} data={teachers} />
-      )}
-      {/* PAGINATION */}
-      <Pagination />
-    </div>
+    <ListPageShell<Teacher>
+      title="All Teachers"
+      table="teacher"
+      columns={columns}
+      renderRow={renderRow}
+      list={list}
+      noun="teachers"
+      canCreate={isAdmin}
+    />
   );
 };
 
