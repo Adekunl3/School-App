@@ -1,12 +1,20 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { api, TOKEN } from "@/lib/api";
 import toast from "react-hot-toast";
-import { parseUserData, storeUserData } from "@/utils/userUtils";
+import { AuthError, login } from "@/lib/authService";
+import { DEFAULT_LANDING_ROUTE } from "@/lib/config";
+import {
+  consumePersistentToast,
+  getLastPath,
+  hasSession,
+  saveTokens,
+  saveUser,
+  setLocked,
+  touchActivity,
+} from "@/lib/authStorage";
 
 const SignInPage = () => {
   const router = useRouter();
@@ -14,141 +22,80 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const[persistToast, setPersistToast]= useState(false);
 
-//   const showPersistentToast = (message: string) => {
-//   // Store first, then show
-//   localStorage.setItem('persistentToast', message);
-//   toast.error(message, { duration: 8000 });
-// };
-
-const showPersistentToast = (message: string) => {
-  localStorage.setItem("persistentToast", message);
-  toast.error(message, { duration: 8000 });
-};
-
-useEffect(() => {
-  const savedToast = localStorage.getItem("persistentToast");
-  if (savedToast) {
-    toast.error(savedToast, { duration: 8000 });
-    localStorage.removeItem("persistentToast");
-  }
-}, []);
-
-
-  // Auth check - runs once on mount
+  // Surface whatever ended the previous session (expiry, idle timeout, ...).
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      router.replace("/admin");
+    const message = consumePersistentToast();
+    if (message) {
+      toast.error(message, { duration: 6000 });
+    }
+  }, []);
+
+  // Already signed in? Go back to the last route so a locked session resumes
+  // on the page the user left, with the lock screen over it.
+  useEffect(() => {
+    if (hasSession()) {
+      router.replace(getLastPath() || DEFAULT_LANDING_ROUTE);
     } else {
       setCheckingAuth(false);
     }
-  },
-    [router]
-  //[]
-  );
-
-  
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous states
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
 
-    // Validation
-    if (!username.trim() || !password.trim()) {
-      toast.error("Please enter both username and password.", {
-        duration: 5000,
-      });
+    if (!trimmedUsername || !trimmedPassword) {
+      toast.error("Please enter both username and password.", { duration: 5000 });
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await api.post(`/Login/${TOKEN}`, { 
-        username: username.trim(), 
-        password: password.trim() 
-      });
+      const result = await login(trimmedUsername, trimmedPassword);
 
-      // Check API response status
-      if (response.data.message === "Success") {
-        const { jwtToken, refreshToken, userId, userName } = response.data;
+      // jwtToken and refreshToken are distinct values — storing one as both
+      // is what previously broke the refresh flow.
+      saveTokens(result);
+      saveUser(trimmedUsername, result.user);
+      setLocked(false);
+      touchActivity();
 
-        // Store tokens
-        localStorage.setItem("accessToken", jwtToken);
-        localStorage.setItem("refreshToken", refreshToken);
-
-      const userData = parseUserData(response.data);
-      storeUserData(userData);
-      
-      // Also store the raw userId for compatibility
-      localStorage.setItem("userId", response.data.userId);
-      
-
-        toast.success("Login successful! Redirecting...", {
-          duration: 3000,
-        });
-
-        // Redirect after short delay
-        setTimeout(() => {
-          router.replace("/admin");
-        }, 1500);
-
-      } else {
-        // API returned failure with custom message
-        const apiErrorMessage = response.data.message || "Login failed. Please try again.";
-        toast.error(apiErrorMessage, {
-          duration: 8000,
-        });
-        setLoading(false); // Reset loading state
-      }
-
-    } catch (err: any) {
-      // Extract specific error message from API response
-      let errorMessage = "Invalid username or password. Please try again.";
-      
-      if (err.response?.data?.message) {
-        // Use API-provided error message
-        errorMessage = err.response.data.message;
-      } else if (err.code === "NETWORK_ERROR") {
-        errorMessage = "Network error. Please check your connection.";
-      } else if (err.response?.status >= 500) {
-        errorMessage = "Server error. Please try again later.";
-      }
-
- showPersistentToast(errorMessage);
-      
-      setLoading(false); 
+      toast.success("Login successful! Redirecting...", { duration: 2000 });
+      router.replace(getLastPath() || DEFAULT_LANDING_ROUTE);
+    } catch (err) {
+      const message =
+        err instanceof AuthError
+          ? err.message
+          : "Invalid username or password. Please try again.";
+      toast.error(message, { duration: 6000 });
+      setPassword("");
+      setLoading(false);
     }
   };
 
-  // Loading state during auth check
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Checking authentication...</p>
+          <p className="mt-4 text-slate-600 dark:text-slate-300">
+            Checking authentication...
+          </p>
         </div>
       </div>
     );
   }
-
-  // if(persistToast)
-  //     toast.error("Error Logging In", {
-  //       duration: 8000, // Long enough to survive re-renders
-  //     });
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-semibold mb-2">Sign in to your account</h1>
         <p className="text-sm text-slate-500 mb-6">
-          Demo sign-in — use any credentials to continue.
+          Use your PowerSoft credentials to continue.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -161,6 +108,7 @@ useEffect(() => {
               className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="Enter your username"
               aria-label="username"
+              autoComplete="username"
               disabled={loading}
             />
           </label>
@@ -174,6 +122,7 @@ useEffect(() => {
               className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               placeholder="Enter your password"
               aria-label="password"
+              autoComplete="current-password"
               disabled={loading}
             />
           </label>
@@ -183,8 +132,8 @@ useEffect(() => {
               <input type="checkbox" className="mr-2" disabled={loading} />
               Remember me
             </label>
-            <Link 
-              href="#" 
+            <Link
+              href="#"
               className="text-sm text-indigo-600 hover:underline disabled:opacity-50"
               onClick={(e) => loading && e.preventDefault()}
             >
@@ -210,17 +159,13 @@ useEffect(() => {
 
         <div className="mt-6 text-center text-sm text-slate-500">
           <span>Don&apos;t have an account? </span>
-          <Link 
-            href="#" 
+          <Link
+            href="#"
             className="text-indigo-600 hover:underline"
             onClick={(e) => loading && e.preventDefault()}
           >
             Sign up
           </Link>
-        </div>
-
-        <div className="mt-6 text-xs text-slate-400 text-center">
-          <strong>Demo credentials:</strong> Use any username and password
         </div>
       </div>
     </div>
@@ -228,8 +173,3 @@ useEffect(() => {
 };
 
 export default SignInPage;
-
-
-
-
-

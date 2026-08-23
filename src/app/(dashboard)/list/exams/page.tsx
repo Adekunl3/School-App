@@ -1,59 +1,65 @@
+"use client";
+
+import { useCallback } from "react";
 import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { examsData, role } from "@/lib/data";
-import Image from "next/image";
+import ListPageShell, { type ListColumn } from "@/components/ListPageShell";
+import { useList } from "@/hooks/useList";
+import { formatDate } from "@/lib/formHelpers";
+import { useIsAdmin } from "@/hooks/useRole";
+import { examService } from "@/services/school";
+import type { Exam } from "@/types/school";
 
-type Exam = {
-  id: number;
-  subject: string;
-  class: string;
-  teacher: string;
-  date: string;
-};
-
-const columns = [
-  {
-    header: "Subject Name",
-    accessor: "name",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Teacher",
-    accessor: "teacher",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Date",
-    accessor: "date",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
+const columns: ListColumn[] = [
+  { header: "Subject", accessor: "subject", sortProperty: "SubjectId" },
+  { header: "Class", accessor: "class", sortProperty: "ClassId" },
+  { header: "Teacher", accessor: "teacher", className: "hidden md:table-cell" },
+  { header: "Date", accessor: "date", sortProperty: "ExamDate" },
+  { header: "Max Score", accessor: "maxScore", className: "hidden lg:table-cell" },
+  { header: "Actions", accessor: "action" },
 ];
 
 const ExamListPage = () => {
+  const isAdmin = useIsAdmin();
+
+  const list = useList<Exam>({
+    fetcher: useCallback((query) => examService.list(query), []),
+    itemsPerPage: 10,
+    initialSortProperty: "ExamDate",
+    initialSortDirection: "Descending",
+  });
+
   const renderRow = (item: Exam) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
     >
-      <td className="flex items-center gap-4 p-4">{item.subject}</td>
-      <td>{item.class}</td>
-      <td className="hidden md:table-cell">{item.teacher}</td>
-      <td className="hidden md:table-cell">{item.date}</td>
+      <td className="p-4">
+        <h3 className="font-semibold">{item.subject || "-"}</h3>
+        {item.title && <p className="text-xs text-gray-500">{item.title}</p>}
+      </td>
+      <td>{item.class || "-"}</td>
+      <td className="hidden md:table-cell">{item.teacher || "Unassigned"}</td>
+      <td>
+        {formatDate(item.date)}
+        {item.startTime && (
+          <span className="block text-xs text-gray-500">
+            {item.startTime}
+            {item.endTime ? ` - ${item.endTime}` : ""}
+          </span>
+        )}
+      </td>
+      <td className="hidden lg:table-cell">{item.maxScore ?? "-"}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" || role === "teacher" && (
+          {isAdmin && (
             <>
-              <FormModal table="exam" type="update" data={item} />
-              <FormModal table="exam" type="delete" id={item.id} />
+              <FormModal table="exam" type="update" data={item} onSuccess={list.refetch} />
+              <FormModal
+                table="exam"
+                type="delete"
+                id={item.examId}
+                onSuccess={list.refetch}
+              />
             </>
           )}
         </div>
@@ -62,28 +68,15 @@ const ExamListPage = () => {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-900 text-black dark:text-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">All Exams</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {role === "admin" || role === "teacher" && <FormModal table="exam" type="create" />}
-          </div>
-        </div>
-      </div>
-      {/* LIST */}
-      <Table columns={columns} renderRow={renderRow} data={examsData} />
-      {/* PAGINATION */}
-      <Pagination />
-    </div>
+    <ListPageShell<Exam>
+      title="All Exams"
+      table="exam"
+      columns={columns}
+      renderRow={renderRow}
+      list={list}
+      noun="exams"
+      canCreate={isAdmin}
+    />
   );
 };
 

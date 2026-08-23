@@ -1,90 +1,98 @@
+"use client";
+
+import { useCallback } from "react";
 import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { classesData, role } from "@/lib/data";
-import Image from "next/image";
+import ListPageShell, { type ListColumn } from "@/components/ListPageShell";
+import { useList } from "@/hooks/useList";
+import { useIsAdmin } from "@/hooks/useRole";
+import { classService } from "@/services/school";
+import type { SchoolClass } from "@/types/school";
 
-type Class = {
-  id: number;
-  name: string;
-  capacity: number;
-  grade: number;
-  supervisor: string;
-};
-
-const columns = [
-  {
-    header: "Class Name",
-    accessor: "name",
-  },
+const columns: ListColumn[] = [
+  { header: "Class Name", accessor: "name", sortProperty: "ClassId" },
   {
     header: "Capacity",
     accessor: "capacity",
     className: "hidden md:table-cell",
+    sortProperty: "Capacity",
   },
   {
     header: "Grade",
     accessor: "grade",
     className: "hidden md:table-cell",
+    sortProperty: "Grade",
   },
-  {
-    header: "Supervisor",
-    accessor: "supervisor",
-    className: "hidden md:table-cell",
-  },
-  {
-    header: "Actions",
-    accessor: "action",
-  },
+  { header: "Supervisor", accessor: "supervisor", className: "hidden md:table-cell" },
+  { header: "Actions", accessor: "action" },
 ];
 
 const ClassListPage = () => {
-  const renderRow = (item: Class) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="flex items-center gap-4 p-4">{item.name}</td>
-      <td className="hidden md:table-cell">{item.capacity}</td>
-      <td className="hidden md:table-cell">{item.grade}</td>
-      <td className="hidden md:table-cell">{item.supervisor}</td>
-      <td>
-        <div className="flex items-center gap-2">
-          {role === "admin" && (
-            <>
-              <FormModal table="class" type="update" data={item} />
-              <FormModal table="class" type="delete" id={item.id} />
-            </>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+  const isAdmin = useIsAdmin();
+
+  const list = useList<SchoolClass>({
+    fetcher: useCallback((query) => classService.list(query), []),
+    itemsPerPage: 10,
+    initialSortProperty: "Grade",
+  });
+
+  const renderRow = (item: SchoolClass) => {
+    // Capacity is optional; a class without one is not "0 of 0 full".
+    const full = item.capacity !== null && item.enrolledCount >= item.capacity;
+
+    return (
+      <tr
+        key={item.id}
+        className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
+      >
+        <td className="flex items-center gap-4 p-4">
+          <div className="flex flex-col">
+            <h3 className="font-semibold">{item.name}</h3>
+            <p className="text-xs text-gray-500">
+              {item.enrolledCount} enrolled
+              {item.capacity !== null && ` of ${item.capacity}`}
+            </p>
+          </div>
+        </td>
+        <td className="hidden md:table-cell">
+          {item.capacity ?? "-"}
+          {full && <span className="ml-2 text-xs text-amber-600">Full</span>}
+        </td>
+        <td className="hidden md:table-cell">{item.grade ?? "-"}</td>
+        <td className="hidden md:table-cell">{item.supervisor || "Unassigned"}</td>
+        <td>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <>
+                <FormModal
+                  table="class"
+                  type="update"
+                  data={item}
+                  onSuccess={list.refetch}
+                />
+                <FormModal
+                  table="class"
+                  type="delete"
+                  id={item.classId}
+                  onSuccess={list.refetch}
+                />
+              </>
+            )}
+          </div>
+        </td>
+      </tr>
+    );
+  };
 
   return (
-    <div className="bg-white dark:bg-gray-900 text-black dark:text-white p-4 rounded-md flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">All Classes</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {role === "admin" && <FormModal table="class" type="create" />}
-          </div>
-        </div>
-      </div>
-      {/* LIST */}
-      <Table columns={columns} renderRow={renderRow} data={classesData} />
-      {/* PAGINATION */}
-      <Pagination />
-    </div>
+    <ListPageShell<SchoolClass>
+      title="All Classes"
+      table="class"
+      columns={columns}
+      renderRow={renderRow}
+      list={list}
+      noun="classes"
+      canCreate={isAdmin}
+    />
   );
 };
 
