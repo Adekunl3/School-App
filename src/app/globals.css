@@ -173,3 +173,22 @@ html.dark button:hover {
 html.dark a:hover {
   color: #63b3ed; /* Brighter blue for links */
 }
+/* GlobalLoader's top bar. */
+@keyframes loaderbar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Submit buttons mark themselves aria-busy while saving. */
+button[aria-busy="true"]::before {
+  content: "";
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.5em;
+  vertical-align: -0.1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 9999px;
+  animation: spin 1s linear infinite;
+}

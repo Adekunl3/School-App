@@ -6,6 +6,7 @@ import { Pie, PieChart, ResponsiveContainer } from "recharts";
 import { useAsync } from "@/hooks/useAsync";
 import { dashboardService } from "@/services/school";
 import type { Performance as PerformanceData } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 /**
  * Average result percentage for one student or one teacher.
@@ -44,7 +45,7 @@ const Performance = ({
       </div>
 
       {loading ? (
-        <p className="mt-8 text-sm text-gray-500">Loading performance...</p>
+        <Loader label="Loading performance..." className="mt-8" />
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : resultCount === 0 ? (

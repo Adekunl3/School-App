@@ -13,6 +13,7 @@ import { useIsAdmin } from "@/hooks/useRole";
 import { formatDate } from "@/lib/formHelpers";
 import { teacherService } from "@/services/school";
 import type { Teacher } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 const SingleTeacherPage = () => {
   const params = useParams<{ id: string }>();
@@ -25,7 +26,7 @@ const SingleTeacherPage = () => {
   );
 
   if (loading) {
-    return <p className="p-4 text-sm text-gray-500">Loading teacher...</p>;
+    return <Loader label="Loading teacher..." className="p-4" />;
   }
 
   if (error || !teacher) {

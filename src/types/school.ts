@@ -543,3 +543,274 @@ export interface Performance {
   resultCount: number;
   breakdown: PerformanceBreakdown[];
 }
+
+// ------------------------------------------------------------------- import
+
+export interface ImportRowResult {
+  /** Row number as shown in the spreadsheet; the header is row 1. */
+  rowNumber: number;
+  success: boolean;
+  /** Id of the created record, including ones the server allocated. */
+  id: string | null;
+  errors: string[];
+}
+
+export interface ImportResult {
+  module: string;
+  fileName: string;
+  totalRows: number;
+  created: number;
+  failed: number;
+  rows: ImportRowResult[];
+}
+
+// --------------------------------------------------------------------- fees
+
+/** 1 = First, 2 = Second, 3 = Third term. */
+export type Term = 1 | 2 | 3;
+
+export type FeeStatus = "Paid" | "Part-paid" | "Unpaid";
+
+/** Values GetFeeBills accepts for `status`. */
+export type FeeStatusFilter = "paid" | "partpaid" | "unpaid" | "outstanding" | "overdue";
+
+export type PaymentMethod = "Cash" | "Transfer" | "POS" | "Cheque" | "Other";
+
+export interface FeeItem {
+  id: string;
+  feeItemId: string;
+  name: string;
+  amount: number;
+  /** e.g. "2026/2027". */
+  session: string;
+  term: Term;
+  termName: string;
+  /** Null when charged to every class. */
+  classId: string | null;
+  /** Class name, or "All classes". */
+  class: string;
+  active: boolean;
+  enteredDate: string | null;
+  modifiedDate: string | null;
+}
+
+export interface FeeItemCreateInput {
+  feeItemId?: string;
+  name: string;
+  amount: number;
+  session: string;
+  term: Term;
+  /** Omit or blank to charge every class. */
+  classId?: string;
+}
+
+export interface FeeItemUpdateInput {
+  feeItemId: string;
+  name?: string;
+  amount?: number;
+  session?: string;
+  term?: Term;
+  /** "" switches the item to every class. */
+  classId?: string;
+  active?: boolean;
+}
+
+export interface FeeBillLine {
+  lineNo: number;
+  feeItemId: string | null;
+  description: string;
+  amount: number;
+}
+
+export interface FeePayment {
+  id: string;
+  paymentId: string;
+  billId: string;
+  studentId: string;
+  student: string | null;
+  classId: string | null;
+  class: string | null;
+  session: string | null;
+  term: Term;
+  termName: string | null;
+  amount: number;
+  paymentDate: string;
+  method: PaymentMethod | null;
+  reference: string | null;
+  /** Shared by the rows of one family payment. */
+  receiptNo: string;
+  remark: string | null;
+  enteredBy: string | null;
+  enteredDate: string | null;
+}
+
+export interface FeeBill {
+  id: string;
+  billId: string;
+  studentId: string;
+  student: string | null;
+  parentId: string | null;
+  parent: string | null;
+  classId: string | null;
+  class: string | null;
+  session: string;
+  term: Term;
+  termName: string;
+  totalAmount: number;
+  discount: number;
+  /** totalAmount - discount. */
+  amountDue: number;
+  amountPaid: number;
+  balance: number;
+  status: FeeStatus;
+  isOverdue: boolean;
+  dueDate: string | null;
+  remark: string | null;
+  enteredDate: string | null;
+  /** Only on GetFeeBillById. */
+  lines: FeeBillLine[] | null;
+  /** Only on GetFeeBillById. */
+  payments: FeePayment[] | null;
+}
+
+export interface FeeBillFilters {
+  session?: string;
+  term?: Term;
+  classId?: string;
+  studentId?: string;
+  parentId?: string;
+  status?: FeeStatusFilter;
+}
+
+export interface FeeBillGenerateInput {
+  session: string;
+  term: Term;
+  /** Omit to bill every class. */
+  classId?: string;
+  /** Bill just this student. */
+  studentId?: string;
+  dueDate?: string;
+}
+
+export interface FeeBillGenerateResult {
+  created: number;
+  alreadyBilled: number;
+  noFeeItems: number;
+  totalBilled: number;
+  billIds: string[];
+}
+
+export interface FeeBillUpdateInput {
+  billId: string;
+  discount?: number;
+  dueDate?: string;
+  remark?: string;
+}
+
+export interface FeePaymentFilters {
+  billId?: string;
+  studentId?: string;
+  receiptNo?: string;
+  session?: string;
+  term?: Term;
+}
+
+/** Identify the bill by billId, or by studentId + session + term. */
+export interface FeePaymentCreateInput {
+  billId?: string;
+  studentId?: string;
+  session?: string;
+  term?: Term;
+  amount: number;
+  paymentDate?: string;
+  method?: PaymentMethod;
+  reference?: string;
+  receiptNo?: string;
+  remark?: string;
+}
+
+export interface FamilyPaymentInput {
+  parentId: string;
+  amount: number;
+  /** Only settle bills for this period. */
+  session?: string;
+  term?: Term;
+  paymentDate?: string;
+  method?: PaymentMethod;
+  reference?: string;
+  receiptNo?: string;
+  remark?: string;
+}
+
+export interface FamilyPaymentResult {
+  receiptNo: string;
+  amount: number;
+  allocations: FeePayment[];
+}
+
+export interface FamilyChildFees {
+  studentId: string;
+  student: string;
+  classId: string | null;
+  class: string | null;
+  amountDue: number;
+  amountPaid: number;
+  balance: number;
+  bills: FeeBill[];
+}
+
+export interface FamilyFees {
+  parentId: string;
+  parent: string;
+  phone: string | null;
+  email: string | null;
+  amountDue: number;
+  amountPaid: number;
+  balance: number;
+  children: FamilyChildFees[];
+}
+
+export interface FeePeriod {
+  session: string;
+  term: Term;
+  termName: string;
+}
+
+export interface FeeClassSummary {
+  classId: string | null;
+  class: string;
+  bills: number;
+  unpaid: number;
+  expected: number;
+  collected: number;
+  outstanding: number;
+}
+
+/** One student's position across every bill they have. */
+export interface StudentFeeStatus {
+  studentId: string;
+  bills: number;
+  amountDue: number;
+  amountPaid: number;
+  balance: number;
+  status: FeeStatus | "No bills";
+  isOverdue: boolean;
+}
+
+export interface FeeSummary {
+  /** Null when nothing has been billed yet. */
+  session: string | null;
+  term: Term | null;
+  termName: string | null;
+  expected: number;
+  collected: number;
+  outstanding: number;
+  bills: number;
+  paid: number;
+  partPaid: number;
+  unpaid: number;
+  overdue: number;
+  byClass: FeeClassSummary[];
+  /** Every billed session + term, newest first. */
+  periods: FeePeriod[];
+}

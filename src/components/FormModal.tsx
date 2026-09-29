@@ -5,11 +5,12 @@ import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { ApiError } from "@/lib/apiClient";
-import { moduleServices, type ModuleName } from "@/services/school";
+import { MODULE_LABELS, moduleServices, type ModuleName } from "@/services/school";
+import { Loader } from "@/components/Spinner";
 
 // Lazy-loaded so opening one module's page does not pull in every other
 // module's form and validation schema.
-const loading = () => <p className="p-4 text-sm text-gray-500">Loading form...</p>;
+const loading = () => <Loader label="Loading form..." className="p-4" />;
 
 const TeacherForm = dynamic(() => import("./forms/TeacherForm"), { loading });
 const StudentForm = dynamic(() => import("./forms/StudentForm"), { loading });
@@ -23,6 +24,9 @@ const ResultForm = dynamic(() => import("./forms/ResultForm"), { loading });
 const EventForm = dynamic(() => import("./forms/EventForm"), { loading });
 const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), { loading });
 const AttendanceForm = dynamic(() => import("./forms/AttendanceForm"), { loading });
+const FeeItemForm = dynamic(() => import("./forms/FeeItemForm"), { loading });
+const FeeBillForm = dynamic(() => import("./forms/FeeBillForm"), { loading });
+const FeePaymentForm = dynamic(() => import("./forms/FeePaymentForm"), { loading });
 
 type FormRenderer = (
   type: "create" | "update",
@@ -67,6 +71,20 @@ const forms: Record<ModuleName, FormRenderer> = {
   attendance: (type, data, onSuccess) => (
     <AttendanceForm type={type} data={data} onSuccess={onSuccess} />
   ),
+  feeItem: (type, data, onSuccess) => (
+    <FeeItemForm type={type} data={data} onSuccess={onSuccess} />
+  ),
+  feeBill: (type, data, onSuccess) => (
+    <FeeBillForm type={type} data={data} onSuccess={onSuccess} />
+  ),
+  feePayment: (type, data, onSuccess) => <FeePaymentForm onSuccess={onSuccess} />,
+};
+
+/** Delete prompts where the generic "all data will be lost" would mislead. */
+const DELETE_PROMPTS: Partial<Record<ModuleName, string>> = {
+  feePayment: "Reverse this payment? The amount goes back onto the bill balance.",
+  feeBill: "Delete this bill? Only bills with no payments can be deleted.",
+  feeItem: "Delete this fee item? Items already on bills cannot be deleted — mark them inactive instead.",
 };
 
 const FormModal = ({
@@ -139,7 +157,8 @@ const FormModal = ({
           className="p-4 flex flex-col gap-4"
         >
           <span className="text-center font-medium">
-            All data will be lost. Are you sure you want to delete this {table}?
+            {DELETE_PROMPTS[table] ??
+              `All data will be lost. Are you sure you want to delete this ${MODULE_LABELS[table] ?? table}?`}
           </span>
           <div className="flex items-center justify-center gap-2">
             <button
@@ -153,6 +172,7 @@ const FormModal = ({
             <button
               type="submit"
               disabled={deleting}
+              aria-busy={deleting}
               className="bg-red-700 text-white py-2 px-4 rounded-md border-none disabled:opacity-60"
             >
               {deleting ? "Deleting..." : "Delete"}
@@ -176,8 +196,8 @@ const FormModal = ({
         type="button"
         className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
         onClick={() => setOpen(true)}
-        title={`${type} ${table}`}
-        aria-label={`${type} ${table}`}
+        title={`${type} ${MODULE_LABELS[table] ?? table}`}
+        aria-label={`${type} ${MODULE_LABELS[table] ?? table}`}
       >
         <Image src={`/${type}.png`} alt="" width={16} height={16} />
       </button>

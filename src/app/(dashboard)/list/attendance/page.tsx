@@ -8,6 +8,7 @@ import { formatDate } from "@/lib/formHelpers";
 import { useCanRecord } from "@/hooks/useRole";
 import { attendanceService } from "@/services/school";
 import type { Attendance } from "@/types/school";
+import { StudentFeeBadge } from "@/components/StudentFeeBadge";
 
 const columns: ListColumn[] = [
   { header: "Student", accessor: "student", sortProperty: "StudentId" },
@@ -43,7 +44,10 @@ const AttendanceListPage = () => {
         key={item.id}
         className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
       >
-        <td className="p-4 font-semibold">{item.student || item.studentId || "-"}</td>
+        <td className="p-4">
+          <p className="font-semibold">{item.student || item.studentId || "-"}</p>
+          <StudentFeeBadge studentId={item.studentId} />
+        </td>
         <td className="hidden md:table-cell">{item.class || "-"}</td>
         <td>{formatDate(item.date)}</td>
         <td>

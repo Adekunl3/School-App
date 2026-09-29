@@ -2,6 +2,7 @@
 
 import { useLookup } from "@/hooks/useLookup";
 import type { LookupSource } from "@/services/school";
+import { Loader } from "@/components/Spinner";
 
 type MultiSelectFieldProps = {
   label: string;
@@ -44,7 +45,7 @@ const MultiSelectField = ({
       </div>
 
       {loading ? (
-        <p className="text-sm text-gray-400">Loading...</p>
+        <Loader label="Loading..." className="" />
       ) : error ? (
         <p className="text-xs text-red-400">{error.message}</p>
       ) : options.length === 0 ? (

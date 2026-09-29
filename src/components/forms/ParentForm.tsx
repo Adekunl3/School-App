@@ -184,6 +184,7 @@ const ParentForm = ({
       <button
         type="submit"
         disabled={submitting}
+        aria-busy={submitting}
         className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
       >
         {submitting

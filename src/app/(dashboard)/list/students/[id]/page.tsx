@@ -12,6 +12,8 @@ import { role } from "@/lib/data";
 import { ApiError } from "@/lib/apiClient";
 import { fetchStudent } from "@/services/students";
 import type { Student } from "@/types/school";
+import { Loader } from "@/components/Spinner";
+import { StudentFeeBadge } from "@/components/StudentFeeBadge";
 
 const formatDate = (value?: string | null): string => {
   if (!value) return "-";
@@ -70,7 +72,7 @@ const SingleStudentPage = () => {
   if (loading) {
     return (
       <div className="flex-1 p-4">
-        <p className="text-sm text-gray-500">Loading student...</p>
+        <Loader label="Loading student..." className="" />
       </div>
     );
   }
@@ -123,6 +125,8 @@ const SingleStudentPage = () => {
                   />
                 )}
               </div>
+
+              <StudentFeeBadge studentId={student.studentId} size="lg" />
 
               <p className="text-sm text-gray-600">
                 Student ID {student.studentId}

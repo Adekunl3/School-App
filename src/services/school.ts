@@ -28,6 +28,7 @@ import {
   teacherEndpoints,
 } from "@/utils/apiEndPoints";
 import { createCrudService, type CrudService } from "./crud";
+import { feeBillCrud, feeItemService, feePaymentCrud } from "./fees";
 import type {
   Announcement,
   AnnouncementCreateInput,
@@ -271,7 +272,10 @@ export type ModuleName =
   | "result"
   | "event"
   | "announcement"
-  | "attendance";
+  | "attendance"
+  | "feeItem"
+  | "feeBill"
+  | "feePayment";
 
 /**
  * Lets generic UI delete a record of any module by name.
@@ -291,4 +295,14 @@ export const moduleServices: Record<ModuleName, CrudService<any, any, any>> = {
   event: eventService,
   announcement: announcementService,
   attendance: attendanceService,
+  feeItem: feeItemService,
+  feeBill: feeBillCrud,
+  feePayment: feePaymentCrud,
+};
+
+/** How each module is named in running text, where the key would read badly. */
+export const MODULE_LABELS: Partial<Record<ModuleName, string>> = {
+  feeItem: "fee item",
+  feeBill: "bill",
+  feePayment: "payment",
 };

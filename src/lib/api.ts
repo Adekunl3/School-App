@@ -9,6 +9,7 @@ import {
   saveTokens,
   setPersistentToast,
 } from "./authStorage";
+import { isWrite, requestFinished, requestStarted } from "./requestTracker";
 
 export { API_BASE_URL };
 /** @deprecated import `LICENSE_TOKEN` from `@/lib/config` instead. */
@@ -26,6 +27,8 @@ type RetriableConfig = InternalAxiosRequestConfig & {
   /** Set on a request to opt it out of the refresh-and-retry cycle. */
   _skipAuthRefresh?: boolean;
 };
+
+type TrackedConfig = InternalAxiosRequestConfig & { _tracked?: boolean };
 
 // ------------------------------------------------- single-flight refresh
 
@@ -81,6 +84,31 @@ export const endSession = (message?: string): void => {
 };
 
 // ------------------------------------------------------------ interceptors
+
+// Registered first so the response side runs before the refresh-and-retry
+// below: the failed original is counted off before its retry is counted on.
+const trackEnd = (config?: TrackedConfig) => {
+  if (!config?._tracked) return;
+  config._tracked = false;
+  requestFinished(isWrite(config.method));
+};
+
+api.interceptors.request.use((config: TrackedConfig) => {
+  config._tracked = true;
+  requestStarted(isWrite(config.method));
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => {
+    trackEnd(response.config as TrackedConfig);
+    return response;
+  },
+  (error) => {
+    trackEnd(error?.config as TrackedConfig | undefined);
+    return Promise.reject(error);
+  }
+);
 
 api.interceptors.request.use(
   (config) => {

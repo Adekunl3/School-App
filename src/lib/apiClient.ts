@@ -5,7 +5,7 @@
 // so unwrapping, error normalisation and list-query building all live here
 // instead of being repeated in each service module.
 
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { api } from "./api";
 import type { PaginationMetadata } from "@/types/school";
 
@@ -142,14 +142,23 @@ export const buildListParams = (query: ListQuery = {}): Record<string, string> =
   return params;
 };
 
+const dropEmpty = (params: Record<string, string | number | undefined>) =>
+  Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== undefined && value !== "")
+  );
+
 /** GET a paged list, returning its rows and pagination metadata. */
 export const getList = async <T>(
   url: string,
   query: ListQuery = {},
-  fallbackError = "Failed to load records."
+  fallbackError = "Failed to load records.",
+  /** Endpoint-specific filters sent alongside the FilterRequest params. */
+  extraParams: Record<string, string | number | undefined> = {}
 ): Promise<ListResult<T>> => {
   try {
-    const response = await api.get(url, { params: buildListParams(query) });
+    const response = await api.get(url, {
+      params: { ...dropEmpty(extraParams), ...buildListParams(query) },
+    });
     assertOk(response.data, fallbackError);
 
     const data = field<unknown>(response.data, "data");
@@ -203,8 +212,9 @@ const mutate = async <T>(
 export const postOne = <T>(
   url: string,
   body: unknown,
-  fallbackError = "Failed to save record."
-): Promise<MutationResult<T>> => mutate<T>(api.post(url, body), fallbackError);
+  fallbackError = "Failed to save record.",
+  config?: AxiosRequestConfig
+): Promise<MutationResult<T>> => mutate<T>(api.post(url, body, config), fallbackError);
 
 export const putOne = <T>(
   url: string,

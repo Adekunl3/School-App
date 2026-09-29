@@ -4,6 +4,7 @@ import Announcements from "@/components/Announcements";
 import BigCalendar from "@/components/BigCalender";
 import Performance from "@/components/Performance";
 import { useMyTeacher } from "@/hooks/useMyTeacher";
+import { Loader } from "@/components/Spinner";
 
 /**
  * A teacher's own dashboard.
@@ -22,7 +23,7 @@ const TeacherPage = () => {
           <h1 className="text-xl font-semibold">Schedule</h1>
 
           {loading ? (
-            <p className="p-4 text-sm text-gray-500">Loading your schedule...</p>
+            <Loader label="Loading your schedule..." className="p-4" />
           ) : error ? (
             <p className="p-4 text-sm text-red-600">{error.detail}</p>
           ) : !teacherId ? (

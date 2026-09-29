@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import SessionGate from "@/components/SessionGate";
 import SessionProvider from "@/providers/SessionProvider";
 import Image from "next/image";
-import Link from "next/link";
+import HomeLink from "@/components/HomeLink";
 
 export default function DashboardLayout({
   children,
@@ -16,13 +16,12 @@ export default function DashboardLayout({
         <div className="h-screen flex">
           {/* LEFT */}
           <div className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] p-4">
-            <Link
-              href="/"
+            <HomeLink
               className="flex items-center justify-center lg:justify-start gap-2"
             >
               <Image src="/logo.png" alt="logo" width={32} height={32} />
               <span className="hidden lg:block font-bold">SchooL App</span>
-            </Link>
+            </HomeLink>
             <Menu />
           </div>
           {/* RIGHT */}

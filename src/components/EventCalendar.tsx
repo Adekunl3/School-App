@@ -7,6 +7,7 @@ import "react-calendar/dist/Calendar.css";
 import { useAsync } from "@/hooks/useAsync";
 import { dashboardService } from "@/services/school";
 import type { SchoolEvent } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -53,7 +54,7 @@ const EventCalendar = () => {
 
       <div className="flex flex-col gap-4">
         {loading ? (
-          <p className="text-sm text-gray-500">Loading events...</p>
+          <Loader label="Loading events..." className="" />
         ) : error ? (
           <p className="text-sm text-red-600">{error.message}</p>
         ) : events.length === 0 ? (

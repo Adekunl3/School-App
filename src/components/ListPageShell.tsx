@@ -3,11 +3,13 @@
 import { useCallback } from "react";
 import Image from "next/image";
 import FormModal from "./FormModal";
+import ImportModal from "./ImportModal";
 import Pagination from "./Pagination";
 import Table from "./Table";
 import TableSearch from "./TableSearch";
 import type { UseListResult } from "@/hooks/useList";
 import type { ModuleName } from "@/services/school";
+import { Loader } from "@/components/Spinner";
 
 export interface ListColumn {
   header: string;
@@ -27,8 +29,14 @@ export interface ListPageShellProps<T> {
   searchPlaceholder?: string;
   /** Noun used in the empty/loading copy, e.g. "lessons". */
   noun?: string;
-  /** Set false for roles that may not create records. */
+  /** Set false for roles that may not create records; also hides import. */
   canCreate?: boolean;
+  /** Show the import button. Defaults to `canCreate`. */
+  canImport?: boolean;
+  /** Extra controls placed before the create button. */
+  toolbar?: React.ReactNode;
+  /** Rendered between the header and the table, e.g. filter selects or totals. */
+  filters?: React.ReactNode;
 }
 
 /**
@@ -48,6 +56,9 @@ const ListPageShell = <T,>({
   searchPlaceholder,
   noun,
   canCreate = true,
+  canImport = canCreate,
+  toolbar,
+  filters,
 }: ListPageShellProps<T>) => {
   const {
     items,
@@ -115,14 +126,18 @@ const ListPageShell = <T,>({
                 <Image src="/sort.png" alt="Sort" width={14} height={14} />
               </button>
             )}
+            {toolbar}
+            {canImport && <ImportModal table={table} noun={label} onSuccess={refetch} />}
             {canCreate && <FormModal table={table} type="create" onSuccess={refetch} />}
           </div>
         </div>
       </div>
 
+      {filters && <div className="mt-4">{filters}</div>}
+
       {/* LIST */}
       {loading ? (
-        <p className="p-4 text-sm text-gray-500">Loading {label}...</p>
+        <Loader label={`Loading ${label}...`} className="p-4" />
       ) : error ? (
         <div className="p-4 text-sm">
           <p className="text-red-600">{error.detail}</p>

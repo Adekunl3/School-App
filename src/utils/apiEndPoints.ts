@@ -62,7 +62,31 @@ export const assignmentEndpoints = crud("Assignment");
 export const resultEndpoints = crud("Result");
 export const eventEndpoints = crud("Event");
 export const announcementEndpoints = crud("Announcement");
-export const attendanceEndpoints = crud("Attendance", "Attendance");
+// "Attendance" routes belong to the HR/payroll controller; school ones are prefixed.
+export const attendanceEndpoints = crud("StudentAttendance", "StudentAttendance");
+
+export const feeItemEndpoints = crud("FeeItem");
+
+/**
+ * Bills are generated from fee items rather than created one by one, and
+ * payments are reversed rather than edited, so neither fits `crud()`.
+ */
+export const feeEndpoints = {
+  bills: (token?: string) => `/GetFeeBills/${t(token)}`,
+  billById: (token?: string) => `/GetFeeBillById/${t(token)}`,
+  generateBills: (token?: string) => `/GenerateFeeBills/${t(token)}`,
+  updateBill: (token?: string) => `/UpdateFeeBill/${t(token)}`,
+  deleteBill: (token?: string) => `/DeleteFeeBill/${t(token)}`,
+  payments: (token?: string) => `/GetFeePayments/${t(token)}`,
+  addPayment: (token?: string) => `/AddFeePayment/${t(token)}`,
+  addFamilyPayment: (token?: string) => `/AddFamilyPayment/${t(token)}`,
+  /** DELETE — reverses the payment and restores the bill balance. */
+  deletePayment: (token?: string) => `/DeleteFeePayment/${t(token)}`,
+  family: (token?: string) => `/GetFamilyFees/${t(token)}`,
+  summary: (token?: string) => `/GetFeeSummary/${t(token)}`,
+  /** GET ?studentIds=a,b,c (at most 200) — each student's balance across all bills. */
+  studentStatus: (token?: string) => `/GetStudentFeeStatus/${t(token)}`,
+};
 
 /** Messages have no update route — a sent message is immutable. */
 export const messageEndpoints = {
@@ -70,6 +94,16 @@ export const messageEndpoints = {
   byId: (token?: string) => `/GetMessageById/${t(token)}`,
   send: (token?: string) => `/SendMessage/${t(token)}`,
   remove: (token?: string) => `/DeleteMessage/${t(token)}`,
+};
+
+/**
+ * Bulk import, shared by every module. Both take `module` (a ModuleName) as
+ * a query parameter; the template also takes `format` ("csv" or "xlsx").
+ */
+export const importEndpoints = {
+  template: (token?: string) => `/GetSchoolImportTemplate/${t(token)}`,
+  /** POST multipart/form-data with a `File` field. */
+  upload: (token?: string) => `/ImportSchoolRecords/${t(token)}`,
 };
 
 /** Id/name sources for select inputs. */
@@ -108,6 +142,9 @@ export const endpoints = {
   announcements: announcementEndpoints,
   attendance: attendanceEndpoints,
   messages: messageEndpoints,
+  imports: importEndpoints,
+  feeItems: feeItemEndpoints,
+  fees: feeEndpoints,
 
   lookups: lookupEndpoints,
   dashboard: dashboardEndpoints,

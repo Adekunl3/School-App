@@ -9,6 +9,7 @@ import { useList } from "@/hooks/useList";
 import { useIsAdmin } from "@/hooks/useRole";
 import { fetchStudents } from "@/services/students";
 import type { Student } from "@/types/school";
+import { StudentFeeBadge } from "@/components/StudentFeeBadge";
 
 const columns: ListColumn[] = [
   { header: "Info", accessor: "info", sortProperty: "LastName" },
@@ -57,6 +58,9 @@ const StudentListPage = () => {
         <div className="flex flex-col">
           <h3 className="font-semibold">{item.name}</h3>
           <p className="text-xs text-gray-500">{item.class || "Unassigned"}</p>
+          <div className="mt-1">
+            <StudentFeeBadge studentId={item.studentId} />
+          </div>
         </div>
       </td>
       <td className="hidden md:table-cell">{item.studentId}</td>

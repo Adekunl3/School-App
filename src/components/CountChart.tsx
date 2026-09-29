@@ -6,6 +6,7 @@ import { RadialBar, RadialBarChart, ResponsiveContainer } from "recharts";
 import { useAsync } from "@/hooks/useAsync";
 import { dashboardService } from "@/services/school";
 import type { GenderCount } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 /** Rounded share of the total, guarding the zero-students case. */
 const share = (part: number, total: number): number =>
@@ -36,7 +37,7 @@ const CountChart = () => {
       </div>
 
       {loading ? (
-        <p className="mt-8 text-sm text-gray-500">Loading...</p>
+        <Loader label="Loading..." className="mt-8" />
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : total === 0 ? (

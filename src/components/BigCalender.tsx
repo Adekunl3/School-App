@@ -7,6 +7,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useAsync } from "@/hooks/useAsync";
 import { dashboardService } from "@/services/school";
 import type { ScheduleEntry } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 const localizer = momentLocalizer(moment);
 
@@ -77,7 +78,7 @@ const BigCalendar = ({
   }, [events]);
 
   if (loading) {
-    return <p className="p-4 text-sm text-gray-500">Loading schedule...</p>;
+    return <Loader label="Loading schedule..." className="p-4" />;
   }
 
   if (error) {

@@ -23,6 +23,12 @@ export const useRole = (): Role => {
   return match ?? "student";
 };
 
+/**
+ * Each role's own dashboard. "Home" must link here rather than to "/", which
+ * redirects to sign-in and from there back to the last page visited.
+ */
+export const homeRouteFor = (role: Role): string => `/${role}`;
+
 /** True when the user may create, edit and delete records. */
 export const useIsAdmin = (): boolean => useRole() === "admin";
 

@@ -15,6 +15,7 @@ import {
 import { useAsync } from "@/hooks/useAsync";
 import { dashboardService } from "@/services/school";
 import type { WeeklyAttendance } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 const AttendanceChart = () => {
   const { data, loading, error } = useAsync<WeeklyAttendance[]>(
@@ -34,7 +35,7 @@ const AttendanceChart = () => {
       </div>
 
       {loading ? (
-        <p className="mt-8 text-sm text-gray-500">Loading attendance...</p>
+        <Loader label="Loading attendance..." className="mt-8" />
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : !hasRecords ? (

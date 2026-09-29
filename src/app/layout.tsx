@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import GlobalLoader from "@/components/GlobalLoader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,6 +39,7 @@ export default function RootLayout({
         >
           Toggle {theme === "light" ? "Dark" : "Light"} Mode
         </button>
+        <GlobalLoader />
         {children}
         {/* <Toaster position ="top-right" toastOptions={{
           duration: 10000, // 4 seconds

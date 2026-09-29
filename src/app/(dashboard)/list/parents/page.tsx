@@ -7,6 +7,7 @@ import { useList } from "@/hooks/useList";
 import { useIsAdmin } from "@/hooks/useRole";
 import { parentService } from "@/services/school";
 import type { Parent } from "@/types/school";
+import { FamilyFeeBadge } from "@/components/StudentFeeBadge";
 
 const columns: ListColumn[] = [
   { header: "Info", accessor: "info", sortProperty: "LastName" },
@@ -40,6 +41,11 @@ const ParentListPage = () => {
       </td>
       <td className="hidden md:table-cell">
         {item.students.length > 0 ? item.students.join(", ") : "No children linked"}
+        {item.studentIds?.length > 0 && (
+          <div className="mt-1">
+            <FamilyFeeBadge parentId={item.parentId} studentIds={item.studentIds} />
+          </div>
+        )}
       </td>
       <td className="hidden lg:table-cell">{item.phone || "-"}</td>
       <td className="hidden lg:table-cell">{item.address || "-"}</td>

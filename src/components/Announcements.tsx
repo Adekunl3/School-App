@@ -6,6 +6,7 @@ import { useAsync } from "@/hooks/useAsync";
 import { formatDate } from "@/lib/formHelpers";
 import { dashboardService } from "@/services/school";
 import type { Announcement } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
 /** Cycled so consecutive cards alternate, as the mock version did. */
 const CARD_TINTS = ["bg-lamaSkyLight", "bg-lamaPurpleLight", "bg-lamaYellowLight"];
@@ -31,7 +32,7 @@ const Announcements = () => {
 
       <div className="flex flex-col gap-4 mt-4">
         {loading ? (
-          <p className="text-sm text-gray-500">Loading announcements...</p>
+          <Loader label="Loading announcements..." className="" />
         ) : error ? (
           <p className="text-sm text-red-600">{error.message}</p>
         ) : announcements.length === 0 ? (

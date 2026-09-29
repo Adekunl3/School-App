@@ -1,6 +1,6 @@
 "use client";
 
-import { useRole } from "@/hooks/useRole";
+import { homeRouteFor, useRole } from "@/hooks/useRole";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -11,7 +11,8 @@ const menuItems = [
       {
         icon: "/home.png",
         label: "Home",
-        href: "/",
+        // Resolved per role at render time; see homeRouteFor.
+        href: "home",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
@@ -95,6 +96,35 @@ const menuItems = [
     ],
   },
   {
+    title: "FINANCE",
+    items: [
+      {
+        icon: "/finance.png",
+        label: "Fees",
+        href: "/list/fees",
+        visible: ["admin"],
+      },
+      {
+        icon: "/finance.png",
+        label: "Payments",
+        href: "/list/fee-payments",
+        visible: ["admin"],
+      },
+      {
+        icon: "/subject.png",
+        label: "Fee items",
+        href: "/list/fee-items",
+        visible: ["admin"],
+      },
+      {
+        icon: "/parent.png",
+        label: "Family fees",
+        href: "/list/fees/family",
+        visible: ["admin"],
+      },
+    ],
+  },
+  {
     title: "OTHER",
     items: [
       {
@@ -133,7 +163,7 @@ const Menu = () => {
             if (item.visible.includes(role)) {
               return (
                 <Link
-                  href={item.href}
+                  href={item.href === "home" ? homeRouteFor(role) : item.href}
                   key={item.label}
                   className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight"
                 >
