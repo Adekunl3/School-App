@@ -1,22 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import {
+  applyTheme,
+  getThemePreference,
+  resolveTheme,
+  setThemePreference,
+  subscribePreferences,
+} from "@/lib/preferences";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
+  // Follows the saved preference, including changes made on the Settings page.
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    const sync = () => {
+      applyTheme();
+      setTheme(resolveTheme(getThemePreference()));
+    };
+    sync();
+    return subscribePreferences(sync);
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-  };
+  const toggleTheme = () => setThemePreference(theme === "light" ? "dark" : "light");
 
   return (
     <button

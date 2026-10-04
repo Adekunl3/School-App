@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useSession } from "@/providers/SessionProvider";
 
@@ -58,9 +59,13 @@ const Navbar = () => {
         </button>
 
         {/* Messages */}
-        <div className="bg-white rounded-full w-7 h-7 flex shrink-0 items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700">
+        <Link
+          href="/list/messages"
+          title="Messages"
+          className="bg-white rounded-full w-7 h-7 flex shrink-0 items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700"
+        >
           <Image src="/message.png" alt="Messages" width={20} height={20} />
-        </div>
+        </Link>
 
         <ThemeToggle />
 
@@ -77,19 +82,22 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* User Info */}
-        <div className="flex flex-col items-end">
-          <span className="text-xs leading-3 font-medium">{displayName}</span>
-          <span className="text-[10px] text-gray-500 text-right dark:text-gray-300">{role}</span>
-        </div>
-
-        {/* Avatar */}
-        <div className="relative">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
-            {initials}
+        {/* User info and avatar open the profile. */}
+        <Link href="/profile" title="Your profile" className="flex items-center gap-6 !text-inherit hover:opacity-80">
+          {/* User Info */}
+          <div className="flex flex-col items-end">
+            <span className="text-xs leading-3 font-medium">{displayName}</span>
+            <span className="text-[10px] text-gray-500 text-right dark:text-gray-300">{role}</span>
           </div>
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-        </div>
+
+          {/* Avatar */}
+          <div className="relative">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+              {initials}
+            </div>
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          </div>
+        </Link>
       </div>
     </div>
   );

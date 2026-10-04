@@ -13,8 +13,8 @@ import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 import { AuthError, login as loginRequest, revokeSession } from "@/lib/authService";
 import { ensureFreshAccessToken } from "@/lib/api";
+import { getIdleLockMs } from "@/lib/preferences";
 import {
-  IDLE_LOCK_MS,
   IDLE_WARNING_MS,
   MAX_LOCK_MS,
   MAX_UNLOCK_ATTEMPTS,
@@ -131,7 +131,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     // closed (or the machine slept) past the threshold — lock immediately
     // rather than granting a fresh window on reload.
     const stored = getLastActivity();
-    if (stored > 0 && Date.now() - stored >= IDLE_LOCK_MS) {
+    if (stored > 0 && Date.now() - stored >= getIdleLockMs()) {
       setLocked(true);
       setStatusSafe("locked");
       return;
@@ -286,7 +286,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       if (stored > lastActivityRef.current) lastActivityRef.current = stored;
 
       const idleFor = Date.now() - lastActivityRef.current;
-      const remaining = IDLE_LOCK_MS - idleFor;
+      const remaining = getIdleLockMs() - idleFor;
       setMsUntilLock(Math.max(0, remaining));
 
       if (remaining <= 0) {

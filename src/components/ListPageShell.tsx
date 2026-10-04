@@ -21,8 +21,11 @@ export interface ListColumn {
 
 export interface ListPageShellProps<T> {
   title: string;
-  /** Module name, for the create button and the delete confirmation wording. */
-  table: ModuleName;
+  /**
+   * Module name, for the create and import buttons. Omit for lists that are
+   * not a generic module (they supply their own `toolbar` actions).
+   */
+  table?: ModuleName;
   columns: ListColumn[];
   renderRow: (item: T) => React.ReactNode;
   list: UseListResult<T>;
@@ -37,6 +40,8 @@ export interface ListPageShellProps<T> {
   toolbar?: React.ReactNode;
   /** Rendered between the header and the table, e.g. filter selects or totals. */
   filters?: React.ReactNode;
+  /** Replaces the "No X yet" line when the list is empty and not searched. */
+  emptyText?: string;
 }
 
 /**
@@ -59,6 +64,7 @@ const ListPageShell = <T,>({
   canImport = canCreate,
   toolbar,
   filters,
+  emptyText,
 }: ListPageShellProps<T>) => {
   const {
     items,
@@ -75,7 +81,7 @@ const ListPageShell = <T,>({
     refetch,
   } = list;
 
-  const label = noun ?? `${table}s`;
+  const label = noun ?? (table ? `${table}s` : "records");
 
   // Steps through the columns the API can order by, flipping direction each
   // time it comes back round to the current one.
@@ -127,8 +133,8 @@ const ListPageShell = <T,>({
               </button>
             )}
             {toolbar}
-            {canImport && <ImportModal table={table} noun={label} onSuccess={refetch} />}
-            {canCreate && <FormModal table={table} type="create" onSuccess={refetch} />}
+            {table && canImport && <ImportModal table={table} noun={label} onSuccess={refetch} />}
+            {table && canCreate && <FormModal table={table} type="create" onSuccess={refetch} />}
           </div>
         </div>
       </div>
@@ -153,7 +159,7 @@ const ListPageShell = <T,>({
         <p className="p-4 text-sm text-gray-500 dark:text-gray-300">
           {searchTerm
             ? `No ${label} match "${searchTerm}".`
-            : `No ${label} yet. Use the + button to add one.`}
+            : emptyText ?? `No ${label} yet. Use the + button to add one.`}
         </p>
       ) : (
         // Wide tables scroll inside their own container rather than pushing the
