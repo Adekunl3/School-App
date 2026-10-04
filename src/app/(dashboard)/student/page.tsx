@@ -21,9 +21,9 @@ const StudentPage = () => {
     <div className="p-4 flex gap-4 flex-col xl:flex-row">
       {/* LEFT */}
       <div className="w-full xl:w-2/3">
-        <div className="h-full bg-white p-4 rounded-md">
+        <div className="h-full bg-white p-4 rounded-md dark:bg-gray-800">
           <h1 className="text-xl font-semibold">Schedule</h1>
-          <p className="p-4 text-sm text-gray-500">
+          <p className="p-4 text-sm text-gray-500 dark:text-gray-300">
             Your timetable is not available yet: student logins are not linked to
             student records, so we cannot tell which class to show. An administrator
             can find your class under Students.

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useSession } from "@/providers/SessionProvider";
 
 const formatCountdown = (ms: number): string => {
@@ -23,7 +24,7 @@ const Navbar = () => {
   return (
     <div className="flex items-center justify-between p-4">
       {/* SEARCH BAR */}
-      <div className="hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
+      <div className="hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2 dark:ring-gray-600">
         <Image src="/search.png" alt="Search" width={14} height={14} />
         <input
           type="text"
@@ -57,12 +58,14 @@ const Navbar = () => {
         </button>
 
         {/* Messages */}
-        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors">
+        <div className="bg-white rounded-full w-7 h-7 flex shrink-0 items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors dark:bg-gray-800 dark:hover:bg-gray-700">
           <Image src="/message.png" alt="Messages" width={20} height={20} />
         </div>
 
+        <ThemeToggle />
+
         {/* Announcements */}
-        <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors relative">
+        <div className="bg-white rounded-full w-7 h-7 flex shrink-0 items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors relative dark:bg-gray-800 dark:hover:bg-gray-700">
           <Image
             src="/announcement.png"
             alt="Announcements"
@@ -77,7 +80,7 @@ const Navbar = () => {
         {/* User Info */}
         <div className="flex flex-col items-end">
           <span className="text-xs leading-3 font-medium">{displayName}</span>
-          <span className="text-[10px] text-gray-500 text-right">{role}</span>
+          <span className="text-[10px] text-gray-500 text-right dark:text-gray-300">{role}</span>
         </div>
 
         {/* Avatar */}

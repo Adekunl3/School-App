@@ -130,10 +130,10 @@ const RemoteSelectField = <T,>({
 
   return (
     <div className="flex flex-col gap-2 w-full md:w-1/4" ref={containerRef}>
-      <label className="text-xs text-gray-500">{label}</label>
+      <label className="text-xs text-gray-500 dark:text-gray-300">{label}</label>
 
       {value && chosenLabel ? (
-        <div className="flex items-center justify-between gap-2 ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm">
+        <div className="flex items-center justify-between gap-2 ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200">
           <span className="truncate">{chosenLabel}</span>
           <button
             type="button"
@@ -157,11 +157,11 @@ const RemoteSelectField = <T,>({
             onFocus={() => setOpen(true)}
             placeholder={placeholder}
             disabled={disabled}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full disabled:opacity-60"
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full disabled:opacity-60 dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
 
           {open && (
-            <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
+            <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:bg-gray-800">
               {loading ? (
                 <p className="p-2 text-xs text-gray-400">Searching...</p>
               ) : loadError ? (

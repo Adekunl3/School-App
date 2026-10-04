@@ -102,7 +102,7 @@ const SingleStudentPage = () => {
         {/* TOP */}
         <div className="flex flex-col lg:flex-row gap-4">
           {/* USER INFO CARD */}
-          <div className="bg-lamaSky py-6 px-4 rounded-md flex-1 flex gap-4">
+          <div className="bg-lamaSky py-6 px-4 rounded-md flex-1 flex gap-4 dark:bg-gray-800">
             <div className="w-1/3">
               <Image
                 src={student.photo || "/avatar.png"}
@@ -128,7 +128,7 @@ const SingleStudentPage = () => {
 
               <StudentFeeBadge studentId={student.studentId} size="lg" />
 
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Student ID {student.studentId}
                 {student.class ? ` · Class ${student.class}` : ""}
                 {student.active ? "" : " · Inactive"}
@@ -199,7 +199,7 @@ const SingleStudentPage = () => {
               </div>
             </div>
           ) : (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-300">
               {student.parentId
                 ? `Linked to parent ${student.parentId}, but that record could not be found.`
                 : "No parent or guardian linked to this student."}
@@ -219,20 +219,20 @@ const SingleStudentPage = () => {
       <div className="w-full xl:w-1/3 flex flex-col gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-md">
           <h1 className="text-xl font-semibold">Shortcuts</h1>
-          <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500">
-            <Link className="p-3 rounded-md bg-lamaSkyLight" href="/list/lessons">
+          <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500 dark:text-gray-300">
+            <Link className="p-3 rounded-md bg-lamaSkyLight dark:bg-gray-700" href="/list/lessons">
               Student&apos;s Lessons
             </Link>
-            <Link className="p-3 rounded-md bg-lamaPurpleLight" href="/list/teachers">
+            <Link className="p-3 rounded-md bg-lamaPurpleLight dark:bg-gray-700" href="/list/teachers">
               Student&apos;s Teachers
             </Link>
             <Link className="p-3 rounded-md bg-pink-50" href="/list/exams">
               Student&apos;s Exams
             </Link>
-            <Link className="p-3 rounded-md bg-lamaSkyLight" href="/list/assignments">
+            <Link className="p-3 rounded-md bg-lamaSkyLight dark:bg-gray-700" href="/list/assignments">
               Student&apos;s Assignments
             </Link>
-            <Link className="p-3 rounded-md bg-lamaYellowLight" href="/list/results">
+            <Link className="p-3 rounded-md bg-lamaYellowLight dark:bg-gray-700" href="/list/results">
               Student&apos;s Results
             </Link>
           </div>

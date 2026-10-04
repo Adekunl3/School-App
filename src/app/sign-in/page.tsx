@@ -92,9 +92,9 @@ const SignInPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
         <h1 className="text-2xl font-semibold mb-2">Sign in to your account</h1>
-        <p className="text-sm text-slate-500 mb-6">
+        <p className="text-sm text-slate-500 mb-6 dark:text-gray-300">
           Use your PowerSoft credentials to continue.
         </p>
 
@@ -105,7 +105,7 @@ const SignInPage = () => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
               placeholder="Enter your username"
               aria-label="username"
               autoComplete="username"
@@ -119,7 +119,7 @@ const SignInPage = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
               placeholder="Enter your password"
               aria-label="password"
               autoComplete="current-password"
@@ -157,7 +157,7 @@ const SignInPage = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-500">
+        <div className="mt-6 text-center text-sm text-slate-500 dark:text-gray-300">
           <span>Don&apos;t have an account? </span>
           <Link
             href="#"

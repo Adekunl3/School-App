@@ -29,8 +29,8 @@ const FeeSummaryTiles = ({ summary }: { summary: FeeSummary }) => {
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {tiles.map((tile) => (
-          <div key={tile.label} className="rounded-md bg-lamaSkyLight p-3">
-            <p className="text-xs text-gray-500">{tile.label}</p>
+          <div key={tile.label} className="rounded-md bg-lamaSkyLight p-3 dark:bg-gray-700">
+            <p className="text-xs text-gray-500 dark:text-gray-300">{tile.label}</p>
             <p className="text-lg font-semibold">{tile.value}</p>
             <p className="text-xs text-gray-400">{tile.hint}</p>
           </div>

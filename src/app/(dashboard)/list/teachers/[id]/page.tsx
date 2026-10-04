@@ -56,7 +56,7 @@ const SingleTeacherPage = () => {
         {/* TOP */}
         <div className="flex flex-col lg:flex-row gap-4">
           {/* USER INFO CARD */}
-          <div className="bg-lamaSky py-6 px-4 rounded-md flex-1 flex gap-4">
+          <div className="bg-lamaSky py-6 px-4 rounded-md flex-1 flex gap-4 dark:bg-gray-800">
             <div className="w-1/3">
               <Image
                 src={teacher.photo || "/avatar.png"}
@@ -80,7 +80,7 @@ const SingleTeacherPage = () => {
                   />
                 )}
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-300">
                 {teacher.username
                   ? `Signs in as ${teacher.username}`
                   : "No platform login linked"}
@@ -108,7 +108,7 @@ const SingleTeacherPage = () => {
 
           {/* SMALL CARDS */}
           <div className="flex-1 flex gap-4 justify-between flex-wrap">
-            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
+            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%] dark:bg-gray-800">
               <Image
                 src="/singleAttendance.png"
                 alt=""
@@ -124,7 +124,7 @@ const SingleTeacherPage = () => {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
+            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%] dark:bg-gray-800">
               <Image
                 src="/singleBranch.png"
                 alt=""
@@ -138,7 +138,7 @@ const SingleTeacherPage = () => {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
+            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%] dark:bg-gray-800">
               <Image
                 src="/singleLesson.png"
                 alt=""
@@ -152,7 +152,7 @@ const SingleTeacherPage = () => {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
+            <div className="bg-white p-4 rounded-md flex gap-4 w-full md:w-[48%] xl:w-[45%] 2xl:w-[48%] dark:bg-gray-800">
               <Image
                 src="/singleClass.png"
                 alt=""
@@ -171,7 +171,7 @@ const SingleTeacherPage = () => {
         </div>
 
         {/* BOTTOM — this teacher's timetable */}
-        <div className="mt-4 bg-white rounded-md p-4 h-[800px]">
+        <div className="mt-4 bg-white rounded-md p-4 h-[800px] dark:bg-gray-800">
           <h1>Teacher&apos;s Schedule</h1>
           <BigCalendar teacherId={teacher.teacherId} />
         </div>
@@ -179,24 +179,24 @@ const SingleTeacherPage = () => {
 
       {/* RIGHT */}
       <div className="w-full xl:w-1/3 flex flex-col gap-4">
-        <div className="bg-white p-4 rounded-md">
+        <div className="bg-white p-4 rounded-md dark:bg-gray-800">
           <h1 className="text-xl font-semibold">Shortcuts</h1>
-          <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500">
+          <div className="mt-4 flex gap-4 flex-wrap text-xs text-gray-500 dark:text-gray-300">
             {/* Filtering by teacher needs the list Filters param, which is not
                 wired yet, so these link to the unfiltered lists. */}
-            <Link className="p-3 rounded-md bg-lamaSkyLight" href="/list/classes">
+            <Link className="p-3 rounded-md bg-lamaSkyLight dark:bg-gray-700" href="/list/classes">
               Classes
             </Link>
-            <Link className="p-3 rounded-md bg-lamaPurpleLight" href="/list/lessons">
+            <Link className="p-3 rounded-md bg-lamaPurpleLight dark:bg-gray-700" href="/list/lessons">
               Lessons
             </Link>
-            <Link className="p-3 rounded-md bg-lamaYellowLight" href="/list/exams">
+            <Link className="p-3 rounded-md bg-lamaYellowLight dark:bg-gray-700" href="/list/exams">
               Exams
             </Link>
             <Link className="p-3 rounded-md bg-pink-50" href="/list/assignments">
               Assignments
             </Link>
-            <Link className="p-3 rounded-md bg-lamaSkyLight" href="/list/results">
+            <Link className="p-3 rounded-md bg-lamaSkyLight dark:bg-gray-700" href="/list/results">
               Results
             </Link>
           </div>

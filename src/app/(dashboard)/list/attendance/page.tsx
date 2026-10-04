@@ -42,7 +42,7 @@ const AttendanceListPage = () => {
     return (
       <tr
         key={item.id}
-        className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
+        className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700/50 dark:hover:bg-gray-700 dark:border-gray-700"
       >
         <td className="p-4">
           <p className="font-semibold">{item.student || item.studentId || "-"}</p>

@@ -54,19 +54,19 @@ const Pagination = ({
 
   if (!controlled) {
     return (
-      <div className="p-4 flex items-center justify-between text-gray-500">
+      <div className="p-4 flex items-center justify-between text-gray-500 dark:text-gray-300">
         <button
           disabled
-          className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700"
         >
           Prev
         </button>
         <div className="flex items-center gap-2 text-sm">
-          <button className="px-2 rounded-sm bg-lamaSky">1</button>
+          <button className="px-2 rounded-sm bg-lamaSky dark:bg-gray-800">1</button>
         </div>
         <button
           disabled
-          className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700"
         >
           Next
         </button>
@@ -80,7 +80,7 @@ const Pagination = ({
   // Nothing to page through — show the count so an empty table is explained.
   if (pageCount <= 1) {
     return (
-      <div className="p-4 flex items-center justify-center text-xs text-gray-500">
+      <div className="p-4 flex items-center justify-center text-xs text-gray-500 dark:text-gray-300">
         {totalCount === 0
           ? "No records found"
           : `${totalCount} record${totalCount === 1 ? "" : "s"}`}
@@ -89,12 +89,12 @@ const Pagination = ({
   }
 
   return (
-    <div className="p-4 flex items-center justify-between text-gray-500">
+    <div className="p-4 flex items-center justify-between text-gray-500 dark:text-gray-300">
       <button
         type="button"
         disabled={disabled || !(hasPrevious ?? page > 1)}
         onClick={() => onPageChange!(page - 1)}
-        className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+        className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700"
       >
         Prev
       </button>
@@ -126,7 +126,7 @@ const Pagination = ({
         type="button"
         disabled={disabled || !(hasNext ?? page < pageCount)}
         onClick={() => onPageChange!(page + 1)}
-        className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+        className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-700"
       >
         Next
       </button>

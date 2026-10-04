@@ -47,11 +47,11 @@ const SelectField = ({
 
   return (
     <div className={`flex flex-col gap-2 w-full ${wide ? "" : "md:w-1/4"}`}>
-      <label className="text-xs text-gray-500">{label}</label>
+      <label className="text-xs text-gray-500 dark:text-gray-300">{label}</label>
       <select
         {...register(name)}
         disabled={disabled || loading}
-        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full disabled:opacity-60"
+        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full disabled:opacity-60 dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
       >
         <option value="">{loading ? "Loading..." : placeholder}</option>
         {items.map((item) => (

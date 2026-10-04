@@ -15,7 +15,7 @@ import type { FamilyFees, FamilyPaymentResult, Parent, PaymentMethod } from "@/t
 import { Loader } from "@/components/Spinner";
 import MoneyInput from "@/components/MoneyInput";
 
-const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full";
+const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
 
 const todayInput = (): string => {
   const now = new Date();
@@ -74,22 +74,22 @@ const FamilyPayment = ({ family, onPaid }: { family: FamilyFees; onPaid: () => v
   };
 
   return (
-    <div className="bg-white p-4 rounded-md flex flex-col gap-4">
+    <div className="bg-white p-4 rounded-md flex flex-col gap-4 dark:bg-gray-800">
       <div>
         <h2 className="font-semibold">Record a family payment</h2>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-300">
           The amount is applied to the oldest outstanding bill first, across all children.
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
-          <label className="text-xs text-gray-500">Amount (₦)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Amount (₦)</label>
           <MoneyInput value={amount} onChange={setAmount} className={inputClass} />
         </div>
         <div className="flex gap-2">
           <div className="flex flex-col gap-2 w-1/2">
-            <label className="text-xs text-gray-500">Date paid</label>
+            <label className="text-xs text-gray-500 dark:text-gray-300">Date paid</label>
             <input
               type="date"
               value={paymentDate}
@@ -99,7 +99,7 @@ const FamilyPayment = ({ family, onPaid }: { family: FamilyFees; onPaid: () => v
             />
           </div>
           <div className="flex flex-col gap-2 w-1/2">
-            <label className="text-xs text-gray-500">Method</label>
+            <label className="text-xs text-gray-500 dark:text-gray-300">Method</label>
             <select
               value={method}
               onChange={(e) => setMethod(e.target.value as PaymentMethod)}
@@ -142,7 +142,7 @@ const FamilyPayment = ({ family, onPaid }: { family: FamilyFees; onPaid: () => v
           <p className="font-medium">
             Receipt {result.receiptNo} — {formatMoney(result.amount)}
           </p>
-          <ul className="mt-1 text-gray-600">
+          <ul className="mt-1 text-gray-600 dark:text-gray-300">
             {result.allocations.map((a) => (
               <li key={a.paymentId}>
                 {a.student}: {formatMoney(a.amount)} ({a.termName} {a.session})
@@ -176,7 +176,7 @@ const FamilyFeesContent = () => {
 
   return (
     <div className="flex-1 p-4 pt-0 flex flex-col gap-4">
-      <div className="bg-white p-4 rounded-md flex flex-col gap-4">
+      <div className="bg-white p-4 rounded-md flex flex-col gap-4 dark:bg-gray-800">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold">Family Fees</h1>
           <Link href="/list/fees" className="text-sm text-indigo-600 hover:underline">
@@ -200,19 +200,19 @@ const FamilyFeesContent = () => {
       </div>
 
       {!parentId ? (
-        <p className="bg-white p-4 rounded-md text-sm text-gray-500">
+        <p className="bg-white p-4 rounded-md text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
           Choose a parent to see all their children&apos;s bills together.
         </p>
       ) : family.loading && !data ? (
-        <Loader label="Loading family fees..." className="bg-white p-4 rounded-md" />
+        <Loader label="Loading family fees..." className="bg-white p-4 rounded-md dark:bg-gray-800" />
       ) : family.error ? (
-        <p className="bg-white p-4 rounded-md text-sm text-red-600">{family.error.detail}</p>
+        <p className="bg-white p-4 rounded-md text-sm text-red-600 dark:bg-gray-800">{family.error.detail}</p>
       ) : data ? (
         <div className="flex flex-col xl:flex-row gap-4">
           <div className="w-full xl:w-2/3 flex flex-col gap-4">
-            <div className="bg-white p-4 rounded-md">
+            <div className="bg-white p-4 rounded-md dark:bg-gray-800">
               <p className="font-semibold">{data.parent}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-300">
                 {[data.phone, data.email].filter(Boolean).join(" · ") || "No contact details"}
               </p>
               <div className="grid grid-cols-3 gap-3 mt-4">
@@ -221,8 +221,8 @@ const FamilyFeesContent = () => {
                   { label: "Paid", value: data.amountPaid },
                   { label: "Balance", value: data.balance },
                 ].map((tile) => (
-                  <div key={tile.label} className="rounded-md bg-lamaSkyLight p-3">
-                    <p className="text-xs text-gray-500">{tile.label}</p>
+                  <div key={tile.label} className="rounded-md bg-lamaSkyLight p-3 dark:bg-gray-700">
+                    <p className="text-xs text-gray-500 dark:text-gray-300">{tile.label}</p>
                     <p className="font-semibold">{formatMoney(tile.value)}</p>
                   </div>
                 ))}
@@ -230,27 +230,27 @@ const FamilyFeesContent = () => {
             </div>
 
             {data.children.length === 0 && (
-              <p className="bg-white p-4 rounded-md text-sm text-gray-500">
+              <p className="bg-white p-4 rounded-md text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
                 No children are linked to this parent. Set the parent on each student&apos;s record.
               </p>
             )}
 
             {data.children.map((child) => (
-              <div key={child.studentId} className="bg-white p-4 rounded-md">
+              <div key={child.studentId} className="bg-white p-4 rounded-md dark:bg-gray-800">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-semibold">{child.student}</p>
-                    <p className="text-xs text-gray-500">{child.class || "No class"}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-300">{child.class || "No class"}</p>
                   </div>
                   <p className="text-sm">
                     Owes <span className="font-semibold">{formatMoney(child.balance)}</span>
                   </p>
                 </div>
                 {child.bills.length === 0 ? (
-                  <p className="text-sm text-gray-500 mt-2">No bills yet.</p>
+                  <p className="text-sm text-gray-500 mt-2 dark:text-gray-300">No bills yet.</p>
                 ) : (
                   <table className="w-full text-sm mt-3">
-                    <thead className="text-xs text-gray-500 text-left">
+                    <thead className="text-xs text-gray-500 text-left dark:text-gray-300">
                       <tr>
                         <th className="py-1">Term</th>
                         <th className="py-1 hidden md:table-cell">Due</th>
@@ -292,7 +292,7 @@ const FamilyFeesContent = () => {
             {data.balance > 0 ? (
               <FamilyPayment family={data} onPaid={family.refetch} />
             ) : (
-              <p className="bg-white p-4 rounded-md text-sm text-green-700">
+              <p className="bg-white p-4 rounded-md text-sm text-green-700 dark:bg-gray-800">
                 {data.amountDue > 0 ? "This family is fully paid up." : "Nothing has been billed yet."}
               </p>
             )}
@@ -308,7 +308,7 @@ const FamilyFeesPage = () => {
 
   if (!isAdmin) {
     return (
-      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500">
+      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
         Only administrators can view school fees.
       </div>
     );

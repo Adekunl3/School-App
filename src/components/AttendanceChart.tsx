@@ -28,7 +28,7 @@ const AttendanceChart = () => {
   const hasRecords = rows.some((row) => row.present > 0 || row.absent > 0);
 
   return (
-    <div className="bg-white rounded-lg p-4 h-full dark:odd:bg-gray-800 dark:even:bg-gray-700">
+    <div className="bg-white rounded-lg p-4 h-full dark:odd:bg-gray-800 dark:even:bg-gray-700 dark:bg-gray-800">
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Attendance</h1>
         <Image src="/moreDark.png" alt="" width={20} height={20} />
@@ -39,7 +39,7 @@ const AttendanceChart = () => {
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : !hasRecords ? (
-        <p className="mt-8 text-sm text-gray-500">
+        <p className="mt-8 text-sm text-gray-500 dark:text-gray-300">
           No attendance recorded this week.
         </p>
       ) : (

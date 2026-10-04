@@ -38,7 +38,7 @@ const MultiSelectField = ({
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-baseline justify-between">
-        <label className="text-xs text-gray-500">{label}</label>
+        <label className="text-xs text-gray-500 dark:text-gray-300">{label}</label>
         {value.length > 0 && (
           <span className="text-xs text-gray-400">{value.length} selected</span>
         )}
@@ -51,7 +51,7 @@ const MultiSelectField = ({
       ) : options.length === 0 ? (
         <p className="text-xs text-amber-500">None available yet — create one first.</p>
       ) : (
-        <div className="max-h-40 overflow-y-auto rounded-md ring-[1.5px] ring-gray-300 p-2 flex flex-col gap-1">
+        <div className="max-h-40 overflow-y-auto rounded-md ring-[1.5px] ring-gray-300 p-2 flex flex-col gap-1 dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200">
           {options.map((option) => (
             <label
               key={option.id}

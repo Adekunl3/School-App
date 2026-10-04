@@ -26,7 +26,7 @@ const FeeItemsPage = () => {
 
   if (!isAdmin) {
     return (
-      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500">
+      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
         Only administrators can manage fee items.
       </div>
     );
@@ -67,7 +67,7 @@ const FeeItemsPage = () => {
       noun="fee items"
       searchPlaceholder="Search fee items..."
       filters={
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-300">
           What the school charges each term. Items with no class apply to every class. Bills are
           generated from these on the Fees page.
         </p>

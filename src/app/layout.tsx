@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 // @ts-ignore: CSS global import type declarations not available in this project setup
 import "./globals.css";
-import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Toaster } from "react-hot-toast";
 import GlobalLoader from "@/components/GlobalLoader";
 
@@ -15,30 +16,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [theme, setTheme] = useState("light");
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle("dark", savedTheme === "dark");
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-  };
+  const pathname = usePathname();
+  // Dashboard pages have the toggle in the Navbar; elsewhere it floats.
+  const showStandaloneToggle = ["/", "/sign-in", "/logout"].includes(pathname);
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <button
-          onClick={toggleTheme}
-          className="fixed top-4 right-56 p-2 bg-gray-200 dark:bg-gray-800 rounded-lg"
-        >
-          Toggle {theme === "light" ? "Dark" : "Light"} Mode
-        </button>
+        {showStandaloneToggle && (
+          <div className="fixed top-4 right-4 z-10">
+            <ThemeToggle />
+          </div>
+        )}
         <GlobalLoader />
         {children}
         {/* <Toaster position ="top-right" toastOptions={{

@@ -40,11 +40,11 @@ const LessonListPage = () => {
   const renderRow = (item: Lesson) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700/50 dark:hover:bg-gray-700 dark:border-gray-700"
     >
       <td className="p-4">
         <h3 className="font-semibold">{item.subject || "-"}</h3>
-        {item.name && <p className="text-xs text-gray-500">{item.name}</p>}
+        {item.name && <p className="text-xs text-gray-500 dark:text-gray-300">{item.name}</p>}
       </td>
       <td>{item.class || "-"}</td>
       <td className="hidden md:table-cell">{item.teacher || "Unassigned"}</td>

@@ -122,7 +122,7 @@ const AttendanceForm = ({
       <div className="flex justify-between flex-wrap gap-4">
         {isUpdate ? (
           <div className="flex flex-col gap-2 w-full md:w-1/3">
-            <span className="text-xs text-gray-500">Student</span>
+            <span className="text-xs text-gray-500 dark:text-gray-300">Student</span>
             <span className="text-sm">{data?.student || data?.studentId || "-"}</span>
             <span className="text-xs text-gray-400">{data?.class || "No class"}</span>
           </div>
@@ -142,13 +142,13 @@ const AttendanceForm = ({
         )}
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Date</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Date</label>
           <input
             type="date"
             value={attendanceDate}
             max={todayInput()}
             onChange={(event) => setAttendanceDate(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
           {errors.attendanceDate && (
             <p className="text-xs text-red-400">{errors.attendanceDate}</p>
@@ -156,7 +156,7 @@ const AttendanceForm = ({
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <span className="text-xs text-gray-500">Status</span>
+          <span className="text-xs text-gray-500 dark:text-gray-300">Status</span>
           <div className="flex gap-4 text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -195,13 +195,13 @@ const AttendanceForm = ({
       </div>
 
       <div className="flex flex-col gap-2 w-full">
-        <label className="text-xs text-gray-500">Remark</label>
+        <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
         <input
           type="text"
           value={remark}
           maxLength={200}
           onChange={(event) => setRemark(event.target.value)}
-          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
           placeholder="Optional — e.g. reason for absence"
         />
       </div>

@@ -13,7 +13,7 @@ import {
 import type { FeeItem, Term } from "@/types/school";
 import MoneyInput from "@/components/MoneyInput";
 
-const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full";
+const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
 
 /**
  * One charge for a session + term, for a single class or every class.
@@ -96,7 +96,7 @@ const FeeItemForm = ({
 
       <div className="flex justify-between flex-wrap gap-4">
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Name</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Name</label>
           <input
             value={name}
             maxLength={80}
@@ -108,13 +108,13 @@ const FeeItemForm = ({
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Amount (₦)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Amount (₦)</label>
           <MoneyInput value={amount} onChange={setAmount} className={inputClass} />
           {errors.amount && <p className="text-xs text-red-400">{errors.amount}</p>}
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Session</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Session</label>
           <input
             value={session}
             onChange={(event) => setSession(event.target.value)}
@@ -125,7 +125,7 @@ const FeeItemForm = ({
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Term</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Term</label>
           <select
             value={term}
             onChange={(event) => setTerm(Number(event.target.value) as Term)}
@@ -140,7 +140,7 @@ const FeeItemForm = ({
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Class</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Class</label>
           <select
             value={classId}
             onChange={(event) => setClassId(event.target.value)}

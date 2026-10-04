@@ -51,7 +51,7 @@ const ResultListPage = () => {
   const renderRow = (item: Result) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700"
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700/50 dark:hover:bg-gray-700 dark:border-gray-700"
     >
       <td className="p-4">
         <p className="font-semibold">{item.student || item.studentId || "-"}</p>
@@ -66,7 +66,7 @@ const ResultListPage = () => {
           {item.maxScore !== null && ` / ${item.maxScore}`}
         </span>
         {item.percentage !== null && (
-          <span className="block text-xs text-gray-500">{item.percentage}%</span>
+          <span className="block text-xs text-gray-500 dark:text-gray-300">{item.percentage}%</span>
         )}
       </td>
       <td className="hidden lg:table-cell">{formatDate(item.date)}</td>

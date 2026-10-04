@@ -37,7 +37,7 @@ const STATUS_FILTERS: { value: FeeStatusFilter | ""; label: string }[] = [
   { value: "overdue", label: "Overdue" },
 ];
 
-const selectClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm";
+const selectClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
 
 /** "2026/2027|1" <-> { session, term }. "" means "latest billed term". */
 const parsePeriod = (value: string): { session?: string; term?: Term } => {
@@ -122,7 +122,7 @@ const FeesContent = () => {
 
   if (!isAdmin) {
     return (
-      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500">
+      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
         Only administrators can view school fees.
       </div>
     );
@@ -134,12 +134,12 @@ const FeesContent = () => {
     return (
       <tr
         key={item.id}
-        className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+        className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700/50 dark:hover:bg-gray-700 dark:border-gray-700"
       >
         <td className="p-4">
           <p className="font-semibold">{item.student || item.studentId}</p>
           <StudentFeeBadge studentId={item.studentId} />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-300">
             {item.parent ? (
               <Link href={`/list/fees/family?parentId=${item.parentId}`} className="hover:underline">
                 Family: {item.parent}
@@ -181,14 +181,14 @@ const FeesContent = () => {
       ) : summary.data && summary.data.bills > 0 ? (
         <FeeSummaryTiles summary={summary.data} />
       ) : !summary.loading ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-300">
           No bills yet. Add <Link href="/list/fee-items" className="text-indigo-600 hover:underline">fee items</Link>{" "}
           for the term, then use the + button to generate bills.
         </p>
       ) : null}
 
       {studentId && (
-        <div className="flex flex-wrap items-center gap-2 text-sm bg-lamaSkyLight rounded-md p-2">
+        <div className="flex flex-wrap items-center gap-2 text-sm bg-lamaSkyLight rounded-md p-2 dark:bg-gray-700">
           <span>
             Every bill for <span className="font-semibold">{list.items[0]?.student || studentId}</span>
             {!selected.session && ", all terms"}
@@ -258,7 +258,7 @@ const FeesContent = () => {
       toolbar={
         <Link
           href="/list/fees/family"
-          className="h-8 px-3 flex items-center rounded-full bg-lamaSky text-xs"
+          className="h-8 px-3 flex items-center rounded-full bg-lamaSky text-xs dark:bg-gray-800"
           title="Fees by family"
         >
           Families

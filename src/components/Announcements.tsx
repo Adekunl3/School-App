@@ -36,7 +36,7 @@ const Announcements = () => {
         ) : error ? (
           <p className="text-sm text-red-600">{error.message}</p>
         ) : announcements.length === 0 ? (
-          <p className="text-sm text-gray-500">No announcements yet.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-300">No announcements yet.</p>
         ) : (
           announcements.map((announcement, index) => (
             <div
@@ -51,7 +51,7 @@ const Announcements = () => {
               </div>
 
               {announcement.description && (
-                <p className="text-sm text-gray-500 mt-1">{announcement.description}</p>
+                <p className="text-sm text-gray-500 mt-1 dark:text-gray-300">{announcement.description}</p>
               )}
 
               {/* The API sends "All" for a school-wide notice. */}

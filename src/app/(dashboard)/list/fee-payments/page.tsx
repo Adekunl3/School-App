@@ -30,7 +30,7 @@ const FeePaymentsPage = () => {
 
   if (!isAdmin) {
     return (
-      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500">
+      <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
         Only administrators can view payments.
       </div>
     );
@@ -39,12 +39,12 @@ const FeePaymentsPage = () => {
   const renderRow = (item: FeePayment) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight dark:even:bg-gray-700/50 dark:hover:bg-gray-700 dark:border-gray-700"
     >
       <td className="p-4">{formatDate(item.paymentDate)}</td>
       <td>
         <p className="font-semibold">{item.student || item.studentId}</p>
-        <p className="text-xs text-gray-500 md:hidden">{item.receiptNo}</p>
+        <p className="text-xs text-gray-500 md:hidden dark:text-gray-300">{item.receiptNo}</p>
         <StudentFeeBadge studentId={item.studentId} />
       </td>
       <td className="hidden lg:table-cell">
@@ -72,7 +72,7 @@ const FeePaymentsPage = () => {
       noun="payments"
       searchPlaceholder="Search student, receipt or reference..."
       filters={
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-300">
           Deleting a payment reverses it and puts the amount back on the bill. To pay for several
           children at once, use the Families page on School Fees.
         </p>

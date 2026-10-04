@@ -102,11 +102,11 @@ const ImportModal = ({
 
       {open && (
         <div className="w-screen h-screen fixed left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white p-4 rounded-md relative w-full md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[45%] max-h-[90vh] overflow-y-auto">
+          <div className="bg-white p-4 rounded-md relative w-full md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[45%] max-h-[90vh] overflow-y-auto dark:bg-gray-800">
             <div className="p-4 flex flex-col gap-4">
               <h2 className="text-lg font-semibold capitalize">Import {noun}</h2>
 
-              <div className="text-sm text-gray-600 flex flex-col gap-2">
+              <div className="text-sm text-gray-600 flex flex-col gap-2 dark:text-gray-300">
                 <p>
                   Upload a .csv, .xls or .xlsx file with one record per row and the column
                   names in the first row. Start from a template to get the columns right.
@@ -153,7 +153,7 @@ const ImportModal = ({
                     {uploading ? "Importing..." : "Import"}
                   </button>
                   {uploading && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-gray-300">
                       Large files can take a minute. Keep this window open.
                     </span>
                   )}

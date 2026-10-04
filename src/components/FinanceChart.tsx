@@ -41,7 +41,7 @@ const FinanceChart = () => {
         <div>
           <h1 className="text-lg font-semibold">Fees</h1>
           {data?.session && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-300">
               {data.termName} {data.session} · {formatMoney(data.collected)} of{" "}
               {formatMoney(data.expected)} collected
             </p>
@@ -57,7 +57,7 @@ const FinanceChart = () => {
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : rows.length === 0 ? (
-        <p className="mt-8 text-sm text-gray-500">
+        <p className="mt-8 text-sm text-gray-500 dark:text-gray-300">
           No bills yet. Set up fee items and generate bills on the Fees page.
         </p>
       ) : (

@@ -49,7 +49,7 @@ const Performance = ({
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : resultCount === 0 ? (
-        <p className="mt-8 text-sm text-gray-500">
+        <p className="mt-8 text-sm text-gray-500 dark:text-gray-300">
           No results recorded yet.
         </p>
       ) : (

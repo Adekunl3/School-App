@@ -140,7 +140,7 @@ const ResultForm = ({
       </h1>
 
       {isUpdate ? (
-        <div className="text-sm text-gray-500 flex flex-col gap-1">
+        <div className="text-sm text-gray-500 flex flex-col gap-1 dark:text-gray-300">
           <span>
             <span className="text-gray-400">Student:</span> {data?.student || "-"}
           </span>
@@ -155,7 +155,7 @@ const ResultForm = ({
       ) : (
         <>
           <div className="flex flex-col gap-2">
-            <span className="text-xs text-gray-500">Result for</span>
+            <span className="text-xs text-gray-500 dark:text-gray-300">Result for</span>
             <div className="flex gap-4 text-sm">
               {(["exam", "assignment"] as ResultType[]).map((option) => (
                 <label key={option} className="flex items-center gap-2 cursor-pointer">
@@ -229,7 +229,7 @@ const ResultForm = ({
 
       <div className="flex justify-between flex-wrap gap-4">
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">
+          <label className="text-xs text-gray-500 dark:text-gray-300">
             Score {data?.maxScore ? `(out of ${data.maxScore})` : ""}
           </label>
           <input
@@ -238,30 +238,30 @@ const ResultForm = ({
             min={0}
             value={score}
             onChange={(event) => setScore(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
           {errors.score && <p className="text-xs text-red-400">{errors.score}</p>}
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Date</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Date</label>
           <input
             type="date"
             value={resultDate}
             onChange={(event) => setResultDate(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
           />
           <p className="text-xs text-gray-400">Defaults to the exam/assignment date.</p>
         </div>
 
         <div className="flex flex-col gap-2 w-full md:w-1/3">
-          <label className="text-xs text-gray-500">Remark</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
           <input
             type="text"
             value={remark}
             maxLength={200}
             onChange={(event) => setRemark(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
             placeholder="Optional"
           />
         </div>

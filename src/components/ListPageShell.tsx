@@ -150,7 +150,7 @@ const ListPageShell = <T,>({
           </button>
         </div>
       ) : items.length === 0 ? (
-        <p className="p-4 text-sm text-gray-500">
+        <p className="p-4 text-sm text-gray-500 dark:text-gray-300">
           {searchTerm
             ? `No ${label} match "${searchTerm}".`
             : `No ${label} yet. Use the + button to add one.`}

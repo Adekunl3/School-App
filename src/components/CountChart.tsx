@@ -29,7 +29,7 @@ const CountChart = () => {
   ];
 
   return (
-    <div className="bg-white rounded-xl w-full h-full p-4 dark:odd:bg-gray-800 dark:even:bg-gray-700">
+    <div className="bg-white rounded-xl w-full h-full p-4 dark:odd:bg-gray-800 dark:even:bg-gray-700 dark:bg-gray-800">
       {/* TITLE */}
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold">Students</h1>
@@ -41,7 +41,7 @@ const CountChart = () => {
       ) : error ? (
         <p className="mt-8 text-sm text-red-600">{error.message}</p>
       ) : total === 0 ? (
-        <p className="mt-8 text-sm text-gray-500">
+        <p className="mt-8 text-sm text-gray-500 dark:text-gray-300">
           No students enrolled yet.
         </p>
       ) : (
@@ -72,7 +72,7 @@ const CountChart = () => {
           {/* BOTTOM */}
           <div className="flex justify-center gap-16">
             <div className="flex flex-col gap-1">
-              <div className="w-5 h-5 bg-lamaSky rounded-full" />
+              <div className="w-5 h-5 bg-lamaSky rounded-full dark:bg-gray-800" />
               <h1 className="font-bold">{boys.toLocaleString()}</h1>
               <h2 className="text-xs text-gray-400">Boys ({share(boys, total)}%)</h2>
             </div>

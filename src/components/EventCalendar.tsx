@@ -58,7 +58,7 @@ const EventCalendar = () => {
         ) : error ? (
           <p className="text-sm text-red-600">{error.message}</p>
         ) : events.length === 0 ? (
-          <p className="text-sm text-gray-500">No events on this day.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-300">No events on this day.</p>
         ) : (
           events.map((event) => (
             <div

@@ -88,7 +88,7 @@ const BigCalendar = ({
   return (
     <>
       {events.length === 0 && (
-        <p className="p-4 text-sm text-gray-500">
+        <p className="p-4 text-sm text-gray-500 dark:text-gray-300">
           No lessons scheduled. Add lessons with a day and time to fill this
           timetable.
         </p>

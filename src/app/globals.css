@@ -111,6 +111,7 @@
 html.dark {
   background-color: #1a202c; /* Dark background */
   color: #e2e8f0; /* Light text */
+  color-scheme: dark;
 }
 
 button.dark {
@@ -150,8 +151,8 @@ html.dark .react-calendar__tile {
 }
 
 html.dark .react-calendar__tile--active {
-  background-color: #4b5563; /* Active tile background */
-  color: #e2e8f0; /* Active tile text */
+  background-color: #4b5563 !important;
+  color: #e2e8f0 !important;
 }
 
 /* Ensure text remains visible on hover in dark mode */
@@ -161,18 +162,47 @@ html.dark .react-calendar__tile:hover {
 }
 
 html.dark .rbc-event:hover {
-  background-color: #2d3748; /* Slightly lighter dark background */
-  color: #ffffff; /* Bright white text */
+  background-color: #4b5563 !important;
+  color: #ffffff !important;
 }
 
-html.dark button:hover {
-  background-color: #374151; /* Dark hover for buttons */
-  color: #ffffff; /* Bright white text */
+html.dark .react-calendar__navigation button:enabled:hover,
+html.dark .react-calendar__navigation button:enabled:focus,
+html.dark .react-calendar__navigation button:disabled {
+  background-color: #374151;
+}
+
+html.dark .rbc-timeslot-group,
+html.dark .rbc-today,
+html.dark .rbc-off-range-bg {
+  background-color: #1f2937 !important;
+}
+
+html.dark .rbc-time-view,
+html.dark .rbc-timeslot-group,
+html.dark .rbc-day-slot .rbc-time-slot,
+html.dark .rbc-time-content > * + * > * {
+  border-color: #374151 !important;
+}
+
+html.dark .rbc-btn-group:last-child button,
+html.dark .rbc-event {
+  background-color: #374151 !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .rbc-toolbar button.rbc-active {
+  background-color: #4b5563 !important;
+}
+
+html.dark .rbc-event-label {
+  color: #d1d5db !important;
 }
 
 html.dark a:hover {
   color: #63b3ed; /* Brighter blue for links */
 }
+
 /* GlobalLoader's top bar. */
 @keyframes loaderbar {
   0% { transform: translateX(-100%); }

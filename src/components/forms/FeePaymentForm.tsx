@@ -10,7 +10,7 @@ import { studentService } from "@/services/school";
 import type { FeeBill, PaymentMethod, Student } from "@/types/school";
 import MoneyInput from "@/components/MoneyInput";
 
-const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full";
+const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
 
 const todayInput = (): string => {
   const now = new Date();
@@ -128,7 +128,7 @@ const FeePaymentForm = ({
       <h1 className="text-xl font-semibold">Record a payment</h1>
 
       {fixedBill ? (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 dark:text-gray-300">
           <p className="font-medium">{fixedBill.student}</p>
           <p>
             {fixedBill.termName} {fixedBill.session} · Bill {fixedBill.billId} · Balance{" "}
@@ -151,7 +151,7 @@ const FeePaymentForm = ({
           />
 
           <div className="flex flex-col gap-2 w-full md:w-[48%]">
-            <label className="text-xs text-gray-500">Bill</label>
+            <label className="text-xs text-gray-500 dark:text-gray-300">Bill</label>
             <select
               value={billId}
               onChange={(e) => {
@@ -178,12 +178,12 @@ const FeePaymentForm = ({
 
       <div className="flex justify-between flex-wrap gap-4">
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Amount (₦)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Amount (₦)</label>
           <MoneyInput value={amount} onChange={setAmount} className={inputClass} />
           {errors.amount && <p className="text-xs text-red-400">{errors.amount}</p>}
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Date paid</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Date paid</label>
           <input
             type="date"
             value={paymentDate}
@@ -194,7 +194,7 @@ const FeePaymentForm = ({
           {errors.paymentDate && <p className="text-xs text-red-400">{errors.paymentDate}</p>}
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Method</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Method</label>
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value as PaymentMethod)}
@@ -208,7 +208,7 @@ const FeePaymentForm = ({
           </select>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Reference</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Reference</label>
           <input
             value={reference}
             maxLength={60}
@@ -218,7 +218,7 @@ const FeePaymentForm = ({
           />
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Remark</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
           <input
             value={remark}
             maxLength={200}

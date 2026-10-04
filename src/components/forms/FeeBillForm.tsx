@@ -18,7 +18,7 @@ import type { FeeBill, Term } from "@/types/school";
 import { Loader } from "@/components/Spinner";
 import MoneyInput from "@/components/MoneyInput";
 
-const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full";
+const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
 
 /**
  * "Create" generates bills for a term from its fee items: every active student
@@ -70,19 +70,19 @@ const GenerateBills = ({ onSuccess }: { onSuccess?: () => void }) => {
   return (
     <form className="flex flex-col gap-6" onSubmit={onSubmit}>
       <h1 className="text-xl font-semibold">Generate bills</h1>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 dark:text-gray-300">
         Each active student gets one bill for the term, made up of the fee items for their
         class plus the items charged to all classes. Students already billed are skipped.
       </p>
 
       <div className="flex justify-between flex-wrap gap-4">
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Session</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Session</label>
           <input value={session} onChange={(e) => setSession(e.target.value)} className={inputClass} />
           {error && <p className="text-xs text-red-400">{error}</p>}
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Term</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Term</label>
           <select
             value={term}
             onChange={(e) => setTerm(Number(e.target.value) as Term)}
@@ -96,7 +96,7 @@ const GenerateBills = ({ onSuccess }: { onSuccess?: () => void }) => {
           </select>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Class</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Class</label>
           <select
             value={classId}
             onChange={(e) => setClassId(e.target.value)}
@@ -112,7 +112,7 @@ const GenerateBills = ({ onSuccess }: { onSuccess?: () => void }) => {
           </select>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500">Due date (optional)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Due date (optional)</label>
           <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={inputClass} />
         </div>
       </div>
@@ -196,7 +196,7 @@ const EditBill = ({ data, onSuccess }: { data: FeeBill; onSuccess?: () => void }
       <div className="flex items-start justify-between gap-4 pr-6">
         <div>
           <h1 className="text-xl font-semibold">Bill {shown.billId}</h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-300">
             {shown.student} · {shown.class || "No class"} · {shown.termName} {shown.session}
           </p>
         </div>
@@ -243,7 +243,7 @@ const EditBill = ({ data, onSuccess }: { data: FeeBill; onSuccess?: () => void }
               <p className="text-gray-500">No payments yet.</p>
             ) : (
               <table className="w-full text-left">
-                <thead className="text-xs text-gray-500">
+                <thead className="text-xs text-gray-500 dark:text-gray-300">
                   <tr>
                     <th className="py-1">Date</th>
                     <th className="py-1">Receipt</th>
@@ -282,15 +282,15 @@ const EditBill = ({ data, onSuccess }: { data: FeeBill; onSuccess?: () => void }
 
       <div className="flex justify-between flex-wrap gap-4">
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Discount (₦)</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Discount (₦)</label>
           <MoneyInput value={discount} onChange={setDiscount} className={inputClass} />
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Due date</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Due date</label>
           <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={inputClass} />
         </div>
         <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500">Remark</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
           <input
             value={remark}
             maxLength={200}

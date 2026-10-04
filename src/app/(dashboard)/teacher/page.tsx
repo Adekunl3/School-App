@@ -19,7 +19,7 @@ const TeacherPage = () => {
     <div className="flex-1 p-4 flex gap-4 flex-col xl:flex-row">
       {/* LEFT */}
       <div className="w-full xl:w-2/3">
-        <div className="h-full bg-white p-4 rounded-md">
+        <div className="h-full bg-white p-4 rounded-md dark:bg-gray-800">
           <h1 className="text-xl font-semibold">Schedule</h1>
 
           {loading ? (
@@ -29,7 +29,7 @@ const TeacherPage = () => {
           ) : !teacherId ? (
             // Deliberately not falling back to the unfiltered timetable — that
             // would show one teacher the whole school's lessons.
-            <p className="p-4 text-sm text-gray-500">
+            <p className="p-4 text-sm text-gray-500 dark:text-gray-300">
               Your login is not linked to a teacher record, so there is no schedule
               to show. Ask an administrator to set the login username on your
               teacher record.

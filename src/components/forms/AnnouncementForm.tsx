@@ -110,11 +110,11 @@ const AnnouncementForm = ({
       </div>
 
       <div className="flex flex-col gap-2 w-full">
-        <label className="text-xs text-gray-500">Message</label>
+        <label className="text-xs text-gray-500 dark:text-gray-300">Message</label>
         <textarea
           rows={4}
           {...register("description")}
-          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
           placeholder="What you want people to know"
         />
         {errors.description?.message && (
