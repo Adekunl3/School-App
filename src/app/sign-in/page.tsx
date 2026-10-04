@@ -129,10 +129,10 @@ useEffect(() => {
   // Loading state during auth check
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Checking authentication...</p>
+          <p className="mt-4 text-slate-600 dark:text-gray-300">Checking authentication...</p>
         </div>
       </div>
     );
@@ -145,9 +145,9 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
         <h1 className="text-2xl font-semibold mb-2">Sign in to your account</h1>
-        <p className="text-sm text-slate-500 mb-6">
+        <p className="text-sm text-slate-500 mb-6 dark:text-gray-300">
           Demo sign-in — use any credentials to continue.
         </p>
 
@@ -158,7 +158,7 @@ useEffect(() => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="mt-1 block w-full rounded-md border border-slate-200 dark:bg-gray-800 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:border-gray-700"
               placeholder="Enter your username"
               aria-label="username"
               disabled={loading}
@@ -171,7 +171,7 @@ useEffect(() => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="mt-1 block w-full rounded-md border border-slate-200 dark:bg-gray-800 dark:text-gray-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:border-gray-700"
               placeholder="Enter your password"
               aria-label="password"
               disabled={loading}
@@ -208,7 +208,7 @@ useEffect(() => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-500">
+        <div className="mt-6 text-center text-sm text-slate-500 dark:text-gray-300">
           <span>Don&apos;t have an account? </span>
           <Link 
             href="#" 

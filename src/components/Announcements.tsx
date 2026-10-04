@@ -18,10 +18,10 @@ const Announcements = () => {
             school.
           </p>
         </div>
-        <div className="bg-lamaPurpleLight rounded-md p-4">
+        <div className="bg-lamaPurpleLight rounded-md p-4 dark:bg-gray-700">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Everyone is welcome</h2>
-            <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
+            <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1 dark:bg-gray-800">
               2025-01-01
             </span>
           </div>
@@ -30,10 +30,10 @@ const Announcements = () => {
             stay Exicted!
           </p>
         </div>
-        <div className="bg-lamaYellowLight rounded-md p-4">
+        <div className="bg-lamaYellowLight rounded-md p-4 dark:bg-gray-700">
           <div className="flex items-center justify-between">
             <h2 className="font-medium">Lorem ipsum dolor sit</h2>
-            <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1">
+            <span className="text-xs text-gray-400 bg-white rounded-md px-1 py-1 dark:bg-gray-800">
               2025-01-01
             </span>
           </div>

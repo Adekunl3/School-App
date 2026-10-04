@@ -58,7 +58,7 @@ const TeacherListPage = () => {
   const renderRow = (item: Teacher) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-red-50 text-sm hover:bg-red-500  dark:even:bg-gray-700"
+      className="border-b border-gray-200 even:bg-red-50 text-sm hover:bg-red-500  dark:even:bg-gray-700 dark:hover:bg-gray-700 dark:border-gray-700"
     >
       <td className="flex items-center gap-4 p-4"> 
         <Image
@@ -70,7 +70,7 @@ const TeacherListPage = () => {
         />
         <div className="flex flex-col">
           <h3 className="font-semibold">{item.name}</h3>
-          <p className="text-xs text-gray-500">{item?.email}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-300">{item?.email}</p>
         </div>
       </td>
       <td className="hidden md:table-cell">{item.teacherId}</td>
@@ -97,7 +97,7 @@ const TeacherListPage = () => {
   );
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
+    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0 dark:bg-gray-800">
       {/* TOP */}
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold">All Teachers</h1>

@@ -124,9 +124,9 @@ const StudentForm = ({
           type="date"
         />
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
+          <label className="text-xs text-gray-500 dark:text-gray-300">Sex</label>
           <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
             {...register("sex")}
             defaultValue={data?.sex}
           >
@@ -141,7 +141,7 @@ const StudentForm = ({
         </div>
         <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
           <label
-            className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
+            className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer dark:text-gray-300"
             htmlFor="img"
           >
             <Image src="/upload.png" alt="" width={28} height={28} />
