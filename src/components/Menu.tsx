@@ -30,7 +30,8 @@ const menuItems = [
       },
       {
         icon: "/parent.png",
-        label: "Parents",
+        // label: "Parents",
+        label: "Wardens",
         href: "/list/parents",
         visible: ["admin", "teacher"],
       },
