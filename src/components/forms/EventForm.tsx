@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import InputField from "../InputField";
+import InputField, { fieldClass } from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import {
   optionalText,
@@ -40,10 +41,12 @@ const EventForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: SchoolEvent;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -101,14 +104,32 @@ const EventForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new event" : "Update event"}
-      </h1>
+  const isCreate = type === "create";
 
-      <div className="flex justify-between flex-wrap gap-4">
-        <InputField label="Title" name="title" register={register} error={errors.title} />
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Create a new event" : "Update event"}
+        subtitle={
+          isCreate
+            ? "Schedule an event for the whole school or a single class. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection
+        title="Event details"
+        hint="What is happening and who it is for"
+        columns="sm:grid-cols-2"
+      >
+        <InputField
+          label="Title"
+          name="title"
+          register={register}
+          error={errors.title}
+          required
+          className="w-full"
+        />
         <SelectField
           label="Class"
           name="classId"
@@ -116,13 +137,32 @@ const EventForm = ({
           error={errors.classId}
           source="classes"
           placeholder="Whole school"
+          className="w-full"
         />
+        <div className="flex w-full flex-col gap-1.5 sm:col-span-2">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
+            Description
+          </label>
+          <textarea
+            rows={3}
+            {...register("description")}
+            className={fieldClass(!!errors.description)}
+          />
+          {errors.description?.message && (
+            <p className="text-xs text-red-500">{errors.description.message.toString()}</p>
+          )}
+        </div>
+      </FormSection>
+
+      <FormSection title="Schedule" hint="Date and time of the event">
         <InputField
           label="Date"
           name="eventDate"
           type="date"
           register={register}
           error={errors.eventDate}
+          required
+          className="w-full"
         />
         <InputField
           label="Start Time"
@@ -130,6 +170,7 @@ const EventForm = ({
           type="time"
           register={register}
           error={errors.startTime}
+          className="w-full"
         />
         <InputField
           label="End Time"
@@ -137,35 +178,16 @@ const EventForm = ({
           type="time"
           register={register}
           error={errors.endTime}
+          className="w-full"
         />
-      </div>
+      </FormSection>
 
-      <div className="flex flex-col gap-2 w-full">
-        <label className="text-xs text-gray-500 dark:text-gray-300">Description</label>
-        <textarea
-          rows={3}
-          {...register("description")}
-          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
-        />
-        {errors.description?.message && (
-          <p className="text-xs text-red-400">{errors.description.message.toString()}</p>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create event" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

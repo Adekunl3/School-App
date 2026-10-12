@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ApiError, type ListQuery, type ListResult } from "@/lib/apiClient";
+import { fieldClass } from "./InputField";
 
 export interface RemoteSelectFieldProps<T> {
   label: string;
@@ -24,6 +25,8 @@ export interface RemoteSelectFieldProps<T> {
   disabled?: boolean;
   /** Sort column sent to the API. */
   sortProperty?: string;
+  /** Overrides the wrapper sizing (default is a quarter-width column). */
+  className?: string;
 }
 
 const PAGE_SIZE = 8;
@@ -50,6 +53,7 @@ const RemoteSelectField = <T,>({
   error,
   disabled = false,
   sortProperty,
+  className,
 }: RemoteSelectFieldProps<T>) => {
   const [term, setTerm] = useState("");
   const [debounced, setDebounced] = useState("");
@@ -129,11 +133,11 @@ const RemoteSelectField = <T,>({
   };
 
   return (
-    <div className="flex flex-col gap-2 w-full md:w-1/4" ref={containerRef}>
-      <label className="text-xs text-gray-500 dark:text-gray-300">{label}</label>
+    <div className={`flex flex-col gap-1.5 ${className ?? "w-full md:w-1/4"}`} ref={containerRef}>
+      <label className="text-xs font-medium text-gray-600 dark:text-gray-300">{label}</label>
 
       {value && chosenLabel ? (
-        <div className="flex items-center justify-between gap-2 ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200">
+        <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
           <span className="truncate">{chosenLabel}</span>
           <button
             type="button"
@@ -157,15 +161,15 @@ const RemoteSelectField = <T,>({
             onFocus={() => setOpen(true)}
             placeholder={placeholder}
             disabled={disabled}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full disabled:opacity-60 dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className={fieldClass(!!error)}
           />
 
           {open && (
-            <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:bg-gray-800">
+            <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800">
               {loading ? (
                 <p className="p-2 text-xs text-gray-400">Searching...</p>
               ) : loadError ? (
-                <p className="p-2 text-xs text-red-400">{loadError}</p>
+                <p className="p-2 text-xs text-red-500">{loadError}</p>
               ) : items.length === 0 ? (
                 <p className="p-2 text-xs text-gray-400">
                   {debounced ? `No matches for "${debounced}".` : "No records found."}
@@ -178,7 +182,7 @@ const RemoteSelectField = <T,>({
                       key={getId(item)}
                       type="button"
                       onClick={() => select(item)}
-                      className="block w-full text-left px-2 py-1.5 text-sm hover:bg-slate-100"
+                      className="block w-full text-left px-2 py-1.5 text-sm hover:bg-slate-100 dark:hover:bg-gray-700"
                     >
                       {getLabel(item)}
                       {hint && <span className="ml-2 text-xs text-gray-400">{hint}</span>}
@@ -191,7 +195,7 @@ const RemoteSelectField = <T,>({
         </div>
       )}
 
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 };

@@ -9,8 +9,12 @@ import { PAYMENT_METHODS, feeService, formatMoney } from "@/services/fees";
 import { studentService } from "@/services/school";
 import type { FeeBill, PaymentMethod, Student } from "@/types/school";
 import MoneyInput from "@/components/MoneyInput";
+import { fieldClass } from "../InputField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 
-const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
+const labelClass = "text-xs font-medium text-gray-600 dark:text-gray-300";
+const wrapClass = "flex w-full flex-col gap-1.5";
+const errClass = "text-xs text-red-500";
 
 const todayInput = (): string => {
   const now = new Date();
@@ -28,12 +32,14 @@ const todayInput = (): string => {
 const FeePaymentForm = ({
   bill: fixedBill,
   onSuccess,
+  onCancel,
 }: {
   type?: "create" | "update";
   data?: unknown;
   /** Pay this bill; skips the student and bill pickers. */
   bill?: FeeBill;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [studentId, setStudentId] = useState(fixedBill?.studentId ?? "");
   const [bills, setBills] = useState<FeeBill[]>(fixedBill ? [fixedBill] : []);
@@ -124,81 +130,95 @@ const FeePaymentForm = ({
   };
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">Record a payment</h1>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title="Record a payment"
+        subtitle="Payments cannot be edited. A mistake is reversed and re-recorded."
+      />
 
-      {fixedBill ? (
-        <div className="text-sm text-gray-600 dark:text-gray-300">
-          <p className="font-medium">{fixedBill.student}</p>
-          <p>
-            {fixedBill.termName} {fixedBill.session} · Bill {fixedBill.billId} · Balance{" "}
-            <span className="font-semibold">{formatMoney(fixedBill.balance)}</span>
-          </p>
-        </div>
-      ) : (
-        <div className="flex justify-between flex-wrap gap-4">
-          <RemoteSelectField<Student>
-            label="Student"
-            fetcher={searchStudents}
-            getId={(item) => item.studentId}
-            getLabel={(item) => item.name}
-            getHint={(item) => item.class}
-            value={studentId}
-            onChange={setStudentId}
-            placeholder="Search students..."
-            error={!studentId ? errors.billId : undefined}
-            sortProperty="LastName"
-          />
-
-          <div className="flex flex-col gap-2 w-full md:w-[48%]">
-            <label className="text-xs text-gray-500 dark:text-gray-300">Bill</label>
-            <select
-              value={billId}
-              onChange={(e) => {
-                setBillId(e.target.value);
-                const next = bills.find((b) => b.billId === e.target.value);
-                if (next) setAmount(String(next.balance));
-              }}
-              className={inputClass}
-              disabled={loadingBills || bills.length === 0}
-            >
-              {bills.length === 0 && (
-                <option value="">{loadingBills ? "Loading..." : "No outstanding bills"}</option>
-              )}
-              {bills.map((b) => (
-                <option key={b.billId} value={b.billId}>
-                  {b.termName} {b.session} — owes {formatMoney(b.balance)}
-                </option>
-              ))}
-            </select>
-            {studentId && errors.billId && <p className="text-xs text-red-400">{errors.billId}</p>}
+      <FormSection
+        title="Bill"
+        hint={fixedBill ? "The bill this payment is for" : "Choose the student and the bill"}
+        columns="sm:grid-cols-2"
+      >
+        {fixedBill ? (
+          <div className="text-sm text-gray-600 dark:text-gray-300 sm:col-span-2">
+            <p className="font-medium text-gray-900 dark:text-white">{fixedBill.student}</p>
+            <p>
+              {fixedBill.termName} {fixedBill.session} · Bill {fixedBill.billId} · Balance{" "}
+              <span className="font-semibold">{formatMoney(fixedBill.balance)}</span>
+            </p>
           </div>
-        </div>
-      )}
+        ) : (
+          <>
+            <RemoteSelectField<Student>
+              label="Student"
+              fetcher={searchStudents}
+              getId={(item) => item.studentId}
+              getLabel={(item) => item.name}
+              getHint={(item) => item.class}
+              value={studentId}
+              onChange={setStudentId}
+              placeholder="Search students..."
+              error={!studentId ? errors.billId : undefined}
+              sortProperty="LastName"
+              className="w-full"
+            />
 
-      <div className="flex justify-between flex-wrap gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Amount (₦)</label>
-          <MoneyInput value={amount} onChange={setAmount} className={inputClass} />
-          {errors.amount && <p className="text-xs text-red-400">{errors.amount}</p>}
+            <div className={wrapClass}>
+              <label className={labelClass}>Bill</label>
+              <select
+                value={billId}
+                onChange={(e) => {
+                  setBillId(e.target.value);
+                  const next = bills.find((b) => b.billId === e.target.value);
+                  if (next) setAmount(String(next.balance));
+                }}
+                className={fieldClass(!!(studentId && errors.billId))}
+                disabled={loadingBills || bills.length === 0}
+              >
+                {bills.length === 0 && (
+                  <option value="">{loadingBills ? "Loading..." : "No outstanding bills"}</option>
+                )}
+                {bills.map((b) => (
+                  <option key={b.billId} value={b.billId}>
+                    {b.termName} {b.session} — owes {formatMoney(b.balance)}
+                  </option>
+                ))}
+              </select>
+              {studentId && errors.billId && <p className={errClass}>{errors.billId}</p>}
+            </div>
+          </>
+        )}
+      </FormSection>
+
+      <FormSection title="Payment details" hint="Amount, date and how it was paid">
+        <div className={wrapClass}>
+          <label className={labelClass}>
+            Amount (₦) <span className="text-red-500">*</span>
+          </label>
+          <MoneyInput value={amount} onChange={setAmount} className={fieldClass(!!errors.amount)} />
+          {errors.amount && <p className={errClass}>{errors.amount}</p>}
         </div>
-        <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Date paid</label>
+        <div className={wrapClass}>
+          <label className={labelClass}>
+            Date paid <span className="text-red-500">*</span>
+          </label>
           <input
             type="date"
             value={paymentDate}
             max={todayInput()}
             onChange={(e) => setPaymentDate(e.target.value)}
-            className={inputClass}
+            className={fieldClass(!!errors.paymentDate)}
           />
-          {errors.paymentDate && <p className="text-xs text-red-400">{errors.paymentDate}</p>}
+          {errors.paymentDate && <p className={errClass}>{errors.paymentDate}</p>}
         </div>
-        <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Method</label>
+        <div className={wrapClass}>
+          <label className={labelClass}>Method</label>
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value as PaymentMethod)}
-            className={inputClass}
+            className={fieldClass(false)}
           >
             {PAYMENT_METHODS.map((m) => (
               <option key={m} value={m}>
@@ -207,36 +227,34 @@ const FeePaymentForm = ({
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Reference</label>
+        <div className={`${wrapClass} sm:col-span-2 lg:col-span-1`}>
+          <label className={labelClass}>Reference</label>
           <input
             value={reference}
             maxLength={60}
             onChange={(e) => setReference(e.target.value)}
-            className={inputClass}
+            className={fieldClass(false)}
             placeholder="Bank or teller reference"
           />
         </div>
-        <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
+        <div className={`${wrapClass} sm:col-span-2`}>
+          <label className={labelClass}>Remark</label>
           <input
             value={remark}
             maxLength={200}
             onChange={(e) => setRemark(e.target.value)}
-            className={inputClass}
+            className={fieldClass(false)}
             placeholder="Optional"
           />
         </div>
-      </div>
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting ? "Recording..." : "Record payment"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel="Record payment"
+        submittingLabel="Recording..."
+      />
     </form>
   );
 };

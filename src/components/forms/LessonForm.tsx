@@ -7,6 +7,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import InputField from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import {
   DAY_OPTIONS,
@@ -39,10 +40,12 @@ const LessonForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Lesson;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -104,20 +107,27 @@ const LessonForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new lesson" : "Update lesson"}
-      </h1>
+  const isCreate = type === "create";
 
-      <span className="text-xs text-gray-400 font-medium">What is taught</span>
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Create a new lesson" : "Update lesson"}
+        subtitle={
+          isCreate
+            ? "Choose what is taught and when. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection title="What is taught" hint="Subject, class and teacher" columns="sm:grid-cols-2">
         <SelectField
           label="Subject"
           name="subjectId"
           register={register}
           error={errors.subjectId}
           source="subjects"
+          className="w-full"
         />
         <SelectField
           label="Class"
@@ -125,6 +135,7 @@ const LessonForm = ({
           register={register}
           error={errors.classId}
           source="classes"
+          className="w-full"
         />
         <SelectField
           label="Teacher"
@@ -133,20 +144,19 @@ const LessonForm = ({
           error={errors.teacherId}
           source="teachers"
           placeholder="Unassigned"
+          className="w-full"
         />
         <InputField
           label="Lesson Name"
           name="name"
           register={register}
           error={errors.name}
+          className="w-full"
           inputProps={{ placeholder: "Optional" }}
         />
-      </div>
+      </FormSection>
 
-      <span className="text-xs text-gray-400 font-medium">
-        Timetable slot — repeats weekly
-      </span>
-      <div className="flex justify-between flex-wrap gap-4">
+      <FormSection title="Timetable slot" hint="Repeats weekly">
         <SelectField
           label="Day"
           name="dayOfWeek"
@@ -154,6 +164,7 @@ const LessonForm = ({
           error={errors.dayOfWeek}
           options={DAY_OPTIONS}
           placeholder="Not scheduled"
+          className="w-full"
         />
         <InputField
           label="Start Time"
@@ -161,6 +172,7 @@ const LessonForm = ({
           type="time"
           register={register}
           error={errors.startTime}
+          className="w-full"
         />
         <InputField
           label="End Time"
@@ -168,30 +180,22 @@ const LessonForm = ({
           type="time"
           register={register}
           error={errors.endTime}
+          className="w-full"
         />
-      </div>
+        {/* The server rejects overlapping slots for the same class or teacher, so
+            say so before the attempt rather than only in the error toast. */}
+        <p className="text-xs text-gray-400 sm:col-span-2 lg:col-span-3">
+          A class and a teacher can each hold only one lesson at a time — overlapping
+          slots are rejected.
+        </p>
+      </FormSection>
 
-      {/* The server rejects overlapping slots for the same class or teacher, so
-          say so before the attempt rather than only in the error toast. */}
-      <p className="text-xs text-gray-400">
-        A class and a teacher can each hold only one lesson at a time — overlapping
-        slots are rejected.
-      </p>
-
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create lesson" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

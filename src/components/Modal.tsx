@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect } from "react";
 
-/** The overlay FormModal uses, for dialogs that are not a module's own form. */
+/** The overlay every form and dialog shares. */
 const Modal = ({
   onClose,
   children,
@@ -11,21 +12,45 @@ const Modal = ({
   onClose: () => void;
   children: React.ReactNode;
   closeDisabled?: boolean;
-}) => (
-  <div className="w-screen h-screen fixed left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-    <div className="bg-white p-4 rounded-md relative w-full md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[45%] max-h-[90vh] overflow-y-auto dark:bg-gray-800">
-      {children}
-      <button
-        type="button"
-        className="absolute top-4 right-4 cursor-pointer disabled:opacity-40"
-        onClick={onClose}
-        disabled={closeDisabled}
-        aria-label="Close"
+}) => {
+  // Escape closes, and the page behind stops scrolling while the modal is up.
+  // Clicking the backdrop deliberately does not close it: a stray click would
+  // throw away a half-filled form.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !closeDisabled) onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [onClose, closeDisabled]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative max-h-[92vh] w-full overflow-y-auto rounded-xl bg-white p-6 shadow-2xl md:w-[80%] lg:w-[70%] xl:w-[60%] 2xl:w-[50%] dark:bg-gray-800"
       >
-        <Image src="/close.png" alt="" width={14} height={14} />
-      </button>
+        {children}
+        <button
+          type="button"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100 disabled:opacity-40 dark:hover:bg-gray-700"
+          onClick={onClose}
+          disabled={closeDisabled}
+          aria-label="Close"
+        >
+          <Image src="/close.png" alt="" width={14} height={14} />
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Modal;

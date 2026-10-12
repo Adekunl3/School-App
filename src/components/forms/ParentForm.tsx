@@ -5,7 +5,8 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import InputField from "../InputField";
+import InputField, { fieldClass } from "../InputField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import { optionalEmail, optionalText, optionalUrl, requiredText } from "@/lib/formHelpers";
 import { invalidateLookups } from "@/hooks/useLookup";
@@ -40,10 +41,12 @@ const ParentForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Parent;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -109,42 +112,51 @@ const ParentForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new parent" : "Update parent"}
-      </h1>
+  const isCreate = type === "create";
 
-      <span className="text-xs text-gray-400 font-medium">Identity</span>
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Add a new parent" : "Update parent"}
+        subtitle={
+          isCreate
+            ? "Fill in the parent's details. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection title="Identity" hint="Name and relationship to the student">
         <InputField
-          label={
-            type === "create" ? "Parent ID (leave blank to auto-generate)" : "Parent ID"
-          }
+          label="Parent ID"
           name="parentId"
           register={register}
           error={errors.parentId}
-          inputProps={{ readOnly: type === "update", disabled: type === "update" }}
+          className="w-full"
+          inputProps={{ readOnly: !isCreate,
+            disabled: !isCreate,
+            placeholder: isCreate ? "Leave blank to auto-generate" : undefined, }}
         />
         <InputField
           label="First Name"
           name="firstName"
           register={register}
           error={errors.firstName}
+          required
+          className="w-full"
         />
         <InputField
           label="Last Name"
           name="lastName"
           register={register}
           error={errors.lastName}
+          required
+          className="w-full"
         />
-
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Relationship</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
-            {...register("relationship")}
-          >
+        <div className="flex w-full flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
+            Relationship
+          </label>
+          <select className={fieldClass(!!errors.relationship)} {...register("relationship")}>
             <option value="">Not specified</option>
             {RELATIONSHIPS.map((relationship) => (
               <option key={relationship} value={relationship}>
@@ -153,48 +165,55 @@ const ParentForm = ({
             ))}
           </select>
           {errors.relationship?.message && (
-            <p className="text-xs text-red-400">
-              {errors.relationship.message.toString()}
-            </p>
+            <p className="text-xs text-red-500">{errors.relationship.message.toString()}</p>
           )}
         </div>
-      </div>
+      </FormSection>
 
-      <span className="text-xs text-gray-400 font-medium">
-        Contact — at least one of phone or email is required
-      </span>
-      <div className="flex justify-between flex-wrap gap-4">
-        <InputField label="Phone" name="phone" register={register} error={errors.phone} />
-        <InputField label="Email" name="email" register={register} error={errors.email} />
+      <FormSection
+        title="Contact"
+        hint="At least one of phone or email is required"
+        columns="sm:grid-cols-2"
+      >
+        <InputField
+          label="Phone"
+          name="phone"
+          type="tel"
+          register={register}
+          error={errors.phone}
+          className="w-full"
+        />
+        <InputField
+          label="Email"
+          name="email"
+          type="email"
+          register={register}
+          error={errors.email}
+          className="w-full"
+        />
         <InputField
           label="Address"
           name="address"
           register={register}
           error={errors.address}
+          className="w-full sm:col-span-2"
         />
         <InputField
           label="Photo URL"
           name="photo"
           register={register}
           error={errors.photo}
+          className="w-full sm:col-span-2"
           inputProps={{ placeholder: "https://..." }}
         />
-      </div>
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create parent" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

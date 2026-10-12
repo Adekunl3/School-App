@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { ApiError } from "@/lib/apiClient";
 import { MODULE_LABELS, moduleServices, type ModuleName } from "@/services/school";
 import { Loader } from "@/components/Spinner";
+import Modal from "@/components/Modal";
 
 // Lazy-loaded so opening one module's page does not pull in every other
 // module's form and validation schema.
@@ -31,53 +32,56 @@ const FeePaymentForm = dynamic(() => import("./forms/FeePaymentForm"), { loading
 type FormRenderer = (
   type: "create" | "update",
   data: any,
-  onSuccess: () => void
+  onSuccess: () => void,
+  onCancel: () => void
 ) => JSX.Element;
 
 const forms: Record<ModuleName, FormRenderer> = {
-  teacher: (type, data, onSuccess) => (
-    <TeacherForm type={type} data={data} onSuccess={onSuccess} />
+  teacher: (type, data, onSuccess, onCancel) => (
+    <TeacherForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  student: (type, data, onSuccess) => (
-    <StudentForm type={type} data={data} onSuccess={onSuccess} />
+  student: (type, data, onSuccess, onCancel) => (
+    <StudentForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  parent: (type, data, onSuccess) => (
-    <ParentForm type={type} data={data} onSuccess={onSuccess} />
+  parent: (type, data, onSuccess, onCancel) => (
+    <ParentForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  class: (type, data, onSuccess) => (
-    <ClassForm type={type} data={data} onSuccess={onSuccess} />
+  class: (type, data, onSuccess, onCancel) => (
+    <ClassForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  subject: (type, data, onSuccess) => (
-    <SubjectForm type={type} data={data} onSuccess={onSuccess} />
+  subject: (type, data, onSuccess, onCancel) => (
+    <SubjectForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  lesson: (type, data, onSuccess) => (
-    <LessonForm type={type} data={data} onSuccess={onSuccess} />
+  lesson: (type, data, onSuccess, onCancel) => (
+    <LessonForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  exam: (type, data, onSuccess) => (
-    <ExamForm type={type} data={data} onSuccess={onSuccess} />
+  exam: (type, data, onSuccess, onCancel) => (
+    <ExamForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  assignment: (type, data, onSuccess) => (
-    <AssignmentForm type={type} data={data} onSuccess={onSuccess} />
+  assignment: (type, data, onSuccess, onCancel) => (
+    <AssignmentForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  result: (type, data, onSuccess) => (
-    <ResultForm type={type} data={data} onSuccess={onSuccess} />
+  result: (type, data, onSuccess, onCancel) => (
+    <ResultForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  event: (type, data, onSuccess) => (
-    <EventForm type={type} data={data} onSuccess={onSuccess} />
+  event: (type, data, onSuccess, onCancel) => (
+    <EventForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  announcement: (type, data, onSuccess) => (
-    <AnnouncementForm type={type} data={data} onSuccess={onSuccess} />
+  announcement: (type, data, onSuccess, onCancel) => (
+    <AnnouncementForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  attendance: (type, data, onSuccess) => (
-    <AttendanceForm type={type} data={data} onSuccess={onSuccess} />
+  attendance: (type, data, onSuccess, onCancel) => (
+    <AttendanceForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  feeItem: (type, data, onSuccess) => (
-    <FeeItemForm type={type} data={data} onSuccess={onSuccess} />
+  feeItem: (type, data, onSuccess, onCancel) => (
+    <FeeItemForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  feeBill: (type, data, onSuccess) => (
-    <FeeBillForm type={type} data={data} onSuccess={onSuccess} />
+  feeBill: (type, data, onSuccess, onCancel) => (
+    <FeeBillForm type={type} data={data} onSuccess={onSuccess} onCancel={onCancel} />
   ),
-  feePayment: (type, data, onSuccess) => <FeePaymentForm onSuccess={onSuccess} />,
+  feePayment: (type, data, onSuccess, onCancel) => (
+    <FeePaymentForm onSuccess={onSuccess} onCancel={onCancel} />
+  ),
 };
 
 /** Delete prompts where the generic "all data will be lost" would mislead. */
@@ -184,7 +188,7 @@ const FormModal = ({
 
     const render = forms[table];
     return render ? (
-      render(type, data, finish)
+      render(type, data, finish, close)
     ) : (
       <p className="p-4 text-sm text-red-500">No form available for {table}.</p>
     );
@@ -202,21 +206,7 @@ const FormModal = ({
         <Image src={`/${type}.png`} alt="" width={16} height={16} />
       </button>
 
-      {open && (
-        <div className="w-screen h-screen fixed left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white p-4 rounded-md relative w-full md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl:w-[45%] max-h-[90vh] overflow-y-auto dark:bg-gray-800">
-            {renderBody()}
-            <button
-              type="button"
-              className="absolute top-4 right-4 cursor-pointer"
-              onClick={close}
-              aria-label="Close"
-            >
-              <Image src="/close.png" alt="" width={14} height={14} />
-            </button>
-          </div>
-        </div>
-      )}
+      {open && <Modal onClose={close}>{renderBody()}</Modal>}
     </>
   );
 };

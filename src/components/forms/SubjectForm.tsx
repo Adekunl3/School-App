@@ -7,6 +7,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import InputField from "../InputField";
 import MultiSelectField from "../MultiSelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import { requiredText } from "@/lib/formHelpers";
 import { invalidateLookups } from "@/hooks/useLookup";
@@ -24,10 +25,12 @@ const SubjectForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Subject;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -87,56 +90,59 @@ const SubjectForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new subject" : "Update subject"}
-      </h1>
+  const isCreate = type === "create";
 
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Add a new subject" : "Update subject"}
+        subtitle={
+          isCreate
+            ? "Fill in the subject details. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection title="Subject details" hint="Code and name" columns="sm:grid-cols-2">
         <InputField
           label="Subject Code"
           name="subjectId"
           register={register}
           error={errors.subjectId}
-          inputProps={{
-            placeholder: "e.g. MTH",
-            readOnly: type === "update",
-            disabled: type === "update",
-          }}
+          required
+          className="w-full"
+          inputProps={{ placeholder: "e.g. MTH",
+            readOnly: !isCreate,
+            disabled: !isCreate, }}
         />
         <InputField
           label="Name"
           name="name"
           register={register}
           error={errors.name}
+          required
+          className="w-full"
           inputProps={{ placeholder: "e.g. Mathematics" }}
         />
-      </div>
+      </FormSection>
 
-      <MultiSelectField
-        label="Teachers"
-        source="teachers"
-        value={teacherIds}
-        onChange={setTeacherIds}
-        hint="Who is qualified to teach this subject. Leave empty to assign later."
-        disabled={submitting}
+      <FormSection title="Teachers" hint="Who can teach this subject" columns="sm:grid-cols-1">
+        <MultiSelectField
+          label="Teachers"
+          source="teachers"
+          value={teacherIds}
+          onChange={setTeacherIds}
+          hint="Who is qualified to teach this subject. Leave empty to assign later."
+          disabled={submitting}
+        />
+      </FormSection>
+
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create subject" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
       />
-
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
     </form>
   );
 };

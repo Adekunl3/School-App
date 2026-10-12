@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import InputField from "../InputField";
+import InputField, { fieldClass } from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import { createStudent, updateStudent } from "@/services/students";
 import type { Student, StudentCreateInput } from "@/types/school";
@@ -67,10 +68,12 @@ const StudentForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Student;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -150,22 +153,29 @@ const StudentForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new student" : "Update student"}
-      </h1>
+  const isCreate = type === "create";
 
-      <span className="text-xs text-gray-400 font-medium">Enrolment</span>
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Add a new student" : "Update student"}
+        subtitle={
+          isCreate
+            ? "Fill in the student's details. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection title="Enrolment" hint="Admission number, class and grade">
         <InputField
-          label={
-            type === "create" ? "Student ID (leave blank to auto-generate)" : "Student ID"
-          }
+          label="Student ID"
           name="studentId"
           register={register}
           error={errors.studentId}
-          inputProps={{ readOnly: type === "update", disabled: type === "update" }}
+          className="w-full"
+          inputProps={{ readOnly: !isCreate,
+            disabled: !isCreate,
+            placeholder: isCreate ? "Leave blank to auto-generate" : undefined, }}
         />
         <SelectField
           label="Class"
@@ -174,6 +184,7 @@ const StudentForm = ({
           error={errors.classId}
           source="classes"
           placeholder="Unassigned"
+          className="w-full"
         />
         <InputField
           label="Grade"
@@ -181,6 +192,7 @@ const StudentForm = ({
           type="number"
           register={register}
           error={errors.grade}
+          className="w-full"
           inputProps={{ min: 1, max: 15 }}
         />
         <InputField
@@ -189,43 +201,33 @@ const StudentForm = ({
           type="date"
           register={register}
           error={errors.admissionDate}
+          className="w-full"
         />
-      </div>
+      </FormSection>
 
-      <span className="text-xs text-gray-400 font-medium">Personal Information</span>
-      <div className="flex justify-between flex-wrap gap-4">
+      <FormSection title="Personal information" hint="Name and basic details">
         <InputField
           label="First Name"
           name="firstName"
           register={register}
           error={errors.firstName}
-        />
-        <InputField
-          label="Last Name"
-          name="lastName"
-          register={register}
-          error={errors.lastName}
+          required
+          className="w-full"
         />
         <InputField
           label="Middle Name"
           name="middleName"
           register={register}
           error={errors.middleName}
-        />
-        <InputField label="Email" name="email" register={register} error={errors.email} />
-        <InputField label="Phone" name="phone" register={register} error={errors.phone} />
-        <InputField
-          label="Address"
-          name="address"
-          register={register}
-          error={errors.address}
+          className="w-full"
         />
         <InputField
-          label="Blood Type"
-          name="bloodType"
+          label="Last Name"
+          name="lastName"
           register={register}
-          error={errors.bloodType}
-          inputProps={{ placeholder: "e.g. A+" }}
+          error={errors.lastName}
+          required
+          className="w-full"
         />
         <InputField
           label="Date of Birth"
@@ -233,26 +235,58 @@ const StudentForm = ({
           type="date"
           register={register}
           error={errors.dateOfBirth}
+          className="w-full"
         />
-
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Sex</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
-            {...register("sex")}
-          >
+        <div className="flex w-full flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
+            Sex
+          </label>
+          <select className={fieldClass(!!errors.sex)} {...register("sex")}>
             <option value="">Not specified</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
           {errors.sex?.message && (
-            <p className="text-xs text-red-400">{errors.sex.message.toString()}</p>
+            <p className="text-xs text-red-500">{errors.sex.message.toString()}</p>
           )}
         </div>
-      </div>
+        <InputField
+          label="Blood Type"
+          name="bloodType"
+          register={register}
+          error={errors.bloodType}
+          className="w-full"
+          inputProps={{ placeholder: "e.g. A+" }}
+        />
+      </FormSection>
 
-      <span className="text-xs text-gray-400 font-medium">Guardian &amp; Photo</span>
-      <div className="flex justify-between flex-wrap gap-4">
+      <FormSection title="Contact" hint="How to reach this student" columns="sm:grid-cols-2">
+        <InputField
+          label="Email"
+          name="email"
+          type="email"
+          register={register}
+          error={errors.email}
+          className="w-full"
+        />
+        <InputField
+          label="Phone"
+          name="phone"
+          type="tel"
+          register={register}
+          error={errors.phone}
+          className="w-full"
+        />
+        <InputField
+          label="Address"
+          name="address"
+          register={register}
+          error={errors.address}
+          className="w-full sm:col-span-2"
+        />
+      </FormSection>
+
+      <FormSection title="Guardian &amp; photo" hint="Linked parent and photo URL" columns="sm:grid-cols-2">
         <SelectField
           label="Parent / Guardian"
           name="parentId"
@@ -260,6 +294,7 @@ const StudentForm = ({
           error={errors.parentId}
           source="parents"
           placeholder="None linked"
+          className="w-full"
         />
         {/* The API stores a photo URL. Direct file upload needs an upload
             endpoint, which the school module does not have yet. */}
@@ -268,24 +303,17 @@ const StudentForm = ({
           name="photo"
           register={register}
           error={errors.photo}
+          className="w-full"
           inputProps={{ placeholder: "https://..." }}
         />
-      </div>
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create student" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

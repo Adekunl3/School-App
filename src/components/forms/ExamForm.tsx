@@ -7,6 +7,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import InputField from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import {
   optionalNumber,
@@ -42,10 +43,12 @@ const ExamForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Exam;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -107,18 +110,30 @@ const ExamForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new exam" : "Update exam"}
-      </h1>
+  const isCreate = type === "create";
 
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Create a new exam" : "Update exam"}
+        subtitle={
+          isCreate
+            ? "Set up the exam and its schedule. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection
+        title="Exam details"
+        hint="Title, subject, class and teacher"
+        columns="sm:grid-cols-2"
+      >
         <InputField
           label="Title"
           name="title"
           register={register}
           error={errors.title}
+          className="w-full sm:col-span-2"
           inputProps={{ placeholder: "e.g. Mid-term" }}
         />
         <SelectField
@@ -127,6 +142,7 @@ const ExamForm = ({
           register={register}
           error={errors.subjectId}
           source="subjects"
+          className="w-full"
         />
         <SelectField
           label="Class"
@@ -134,6 +150,7 @@ const ExamForm = ({
           register={register}
           error={errors.classId}
           source="classes"
+          className="w-full"
         />
         <SelectField
           label="Teacher"
@@ -142,31 +159,23 @@ const ExamForm = ({
           error={errors.teacherId}
           source="teachers"
           placeholder="Unassigned"
+          className="w-full sm:col-span-2"
         />
-      </div>
+      </FormSection>
 
-      <span className="text-xs text-gray-400 font-medium">Schedule &amp; marking</span>
-      <div className="flex justify-between flex-wrap gap-4">
+      <FormSection
+        title="Schedule & marking"
+        hint="Date, time and maximum score"
+        columns="sm:grid-cols-2"
+      >
         <InputField
           label="Date"
           name="examDate"
           type="date"
           register={register}
           error={errors.examDate}
-        />
-        <InputField
-          label="Start Time"
-          name="startTime"
-          type="time"
-          register={register}
-          error={errors.startTime}
-        />
-        <InputField
-          label="End Time"
-          name="endTime"
-          type="time"
-          register={register}
-          error={errors.endTime}
+          required
+          className="w-full"
         />
         <InputField
           label="Max Score"
@@ -174,32 +183,40 @@ const ExamForm = ({
           type="number"
           register={register}
           error={errors.maxScore}
+          className="w-full"
           inputProps={{ min: 0, step: "0.01", placeholder: "e.g. 100" }}
         />
-      </div>
+        <InputField
+          label="Start Time"
+          name="startTime"
+          type="time"
+          register={register}
+          error={errors.startTime}
+          className="w-full"
+        />
+        <InputField
+          label="End Time"
+          name="endTime"
+          type="time"
+          register={register}
+          error={errors.endTime}
+          className="w-full"
+        />
+        {/* Results snapshot MaxScore, and the server refuses to lower it below a
+            mark already awarded. */}
+        {!isCreate && (
+          <p className="text-xs text-gray-400 sm:col-span-2">
+            Max score cannot be lowered below the highest mark already recorded.
+          </p>
+        )}
+      </FormSection>
 
-      {/* Results snapshot MaxScore, and the server refuses to lower it below a
-          mark already awarded. */}
-      {type === "update" && (
-        <p className="text-xs text-gray-400">
-          Max score cannot be lowered below the highest mark already recorded.
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create exam" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

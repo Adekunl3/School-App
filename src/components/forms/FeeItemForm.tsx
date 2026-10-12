@@ -12,8 +12,12 @@ import {
 } from "@/services/fees";
 import type { FeeItem, Term } from "@/types/school";
 import MoneyInput from "@/components/MoneyInput";
+import { fieldClass } from "../InputField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 
-const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
+const labelClass = "text-xs font-medium text-gray-600 dark:text-gray-300";
+const wrapClass = "flex w-full flex-col gap-1.5";
+const errClass = "text-xs text-red-500";
 
 /**
  * One charge for a session + term, for a single class or every class.
@@ -25,10 +29,12 @@ const FeeItemForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: FeeItem;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const isUpdate = type === "update";
   const classes = useLookup("classes");
@@ -91,45 +97,60 @@ const FeeItemForm = ({
   };
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">{isUpdate ? "Update fee item" : "Add a fee item"}</h1>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isUpdate ? "Update fee item" : "Add a fee item"}
+        subtitle={
+          isUpdate
+            ? "Changes apply to bills generated from now on. Bills already issued keep their amounts."
+            : "Define a charge for a session and term. Fields marked * are required."
+        }
+      />
 
-      <div className="flex justify-between flex-wrap gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Name</label>
+      <FormSection title="Charge" hint="What is being charged and how much" columns="sm:grid-cols-2">
+        <div className={wrapClass}>
+          <label className={labelClass}>
+            Name <span className="text-red-500">*</span>
+          </label>
           <input
             value={name}
             maxLength={80}
             onChange={(event) => setName(event.target.value)}
-            className={inputClass}
+            className={fieldClass(!!errors.name)}
             placeholder="e.g. Tuition"
           />
-          {errors.name && <p className="text-xs text-red-400">{errors.name}</p>}
+          {errors.name && <p className={errClass}>{errors.name}</p>}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-[48%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Amount (₦)</label>
-          <MoneyInput value={amount} onChange={setAmount} className={inputClass} />
-          {errors.amount && <p className="text-xs text-red-400">{errors.amount}</p>}
+        <div className={wrapClass}>
+          <label className={labelClass}>
+            Amount (₦) <span className="text-red-500">*</span>
+          </label>
+          <MoneyInput value={amount} onChange={setAmount} className={fieldClass(!!errors.amount)} />
+          {errors.amount && <p className={errClass}>{errors.amount}</p>}
         </div>
+      </FormSection>
 
-        <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Session</label>
+      <FormSection title="Applies to" hint="Session, term and class">
+        <div className={wrapClass}>
+          <label className={labelClass}>
+            Session <span className="text-red-500">*</span>
+          </label>
           <input
             value={session}
             onChange={(event) => setSession(event.target.value)}
-            className={inputClass}
+            className={fieldClass(!!errors.session)}
             placeholder="2026/2027"
           />
-          {errors.session && <p className="text-xs text-red-400">{errors.session}</p>}
+          {errors.session && <p className={errClass}>{errors.session}</p>}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Term</label>
+        <div className={wrapClass}>
+          <label className={labelClass}>Term</label>
           <select
             value={term}
             onChange={(event) => setTerm(Number(event.target.value) as Term)}
-            className={inputClass}
+            className={fieldClass(false)}
           >
             {TERM_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -139,12 +160,12 @@ const FeeItemForm = ({
           </select>
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-[30%]">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Class</label>
+        <div className={wrapClass}>
+          <label className={labelClass}>Class</label>
           <select
             value={classId}
             onChange={(event) => setClassId(event.target.value)}
-            className={inputClass}
+            className={fieldClass(false)}
             disabled={classes.loading}
           >
             <option value="">All classes</option>
@@ -157,7 +178,7 @@ const FeeItemForm = ({
         </div>
 
         {isUpdate && (
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-700 dark:text-gray-200 sm:col-span-2 lg:col-span-3">
             <input
               type="checkbox"
               checked={active}
@@ -166,22 +187,14 @@ const FeeItemForm = ({
             Active — inactive items are left off newly generated bills
           </label>
         )}
-      </div>
+      </FormSection>
 
-      {isUpdate && (
-        <p className="text-xs text-gray-400">
-          Changes apply to bills generated from now on. Bills already issued keep their amounts.
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting ? "Saving..." : isUpdate ? "Update" : "Create"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isUpdate ? "Save changes" : "Create fee item"}
+        submittingLabel={isUpdate ? "Saving..." : "Creating..."}
+      />
     </form>
   );
 };

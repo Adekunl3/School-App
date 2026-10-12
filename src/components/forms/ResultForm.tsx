@@ -3,6 +3,8 @@
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import RemoteSelectField from "../RemoteSelectField";
+import { fieldClass } from "../InputField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError, type ListQuery } from "@/lib/apiClient";
 import { toApiDate, toDateInput } from "@/lib/formHelpers";
 import {
@@ -33,10 +35,12 @@ const ResultForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Result;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const isUpdate = type === "update";
 
@@ -134,31 +138,51 @@ const ResultForm = ({
   };
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {isUpdate ? "Update result" : "Record a result"}
-      </h1>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isUpdate ? "Update result" : "Record a result"}
+        subtitle={
+          isUpdate
+            ? "Change the mark, date or remark and save."
+            : "Pick the student and the exam or assignment, then enter the mark."
+        }
+      />
 
       {isUpdate ? (
-        <div className="text-sm text-gray-500 flex flex-col gap-1 dark:text-gray-300">
-          <span>
-            <span className="text-gray-400">Student:</span> {data?.student || "-"}
-          </span>
-          <span>
-            <span className="text-gray-400">For:</span> {data?.subject || "-"} (
-            {data?.type || "-"})
-          </span>
-          <span className="text-xs text-gray-400">
+        <FormSection
+          title="Result for"
+          hint="Student and source cannot be changed"
+          columns="sm:grid-cols-2"
+        >
+          <div className="flex w-full flex-col gap-1.5">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Student</span>
+            <span className="text-sm text-gray-800 dark:text-gray-100">
+              {data?.student || "-"}
+            </span>
+          </div>
+          <div className="flex w-full flex-col gap-1.5">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">For</span>
+            <span className="text-sm text-gray-800 dark:text-gray-100">
+              {data?.subject || "-"} ({data?.type || "-"})
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 sm:col-span-2">
             Student and source cannot be changed — delete and re-record instead.
-          </span>
-        </div>
+          </p>
+        </FormSection>
       ) : (
-        <>
-          <div className="flex flex-col gap-2">
-            <span className="text-xs text-gray-500 dark:text-gray-300">Result for</span>
-            <div className="flex gap-4 text-sm">
+        <FormSection
+          title="Result for"
+          hint="Who and what the mark is for"
+          columns="sm:grid-cols-2"
+        >
+          <div className="flex w-full flex-col gap-1.5 sm:col-span-2">
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+              Result for
+            </span>
+            <div className="flex gap-4 text-sm text-gray-800 dark:text-gray-100">
               {(["exam", "assignment"] as ResultType[]).map((option) => (
-                <label key={option} className="flex items-center gap-2 cursor-pointer">
+                <label key={option} className="flex cursor-pointer items-center gap-2">
                   <input
                     type="radio"
                     name="resultType"
@@ -170,6 +194,7 @@ const ResultForm = ({
                       if (option === "exam") setAssignmentId("");
                       else setExamId("");
                     }}
+                    className="accent-indigo-600"
                   />
                   <span className="capitalize">{option}</span>
                 </label>
@@ -177,60 +202,62 @@ const ResultForm = ({
             </div>
           </div>
 
-          <div className="flex justify-between flex-wrap gap-4">
-            <RemoteSelectField<Student>
-              label="Student"
-              fetcher={searchStudents}
-              getId={(item) => item.studentId}
-              getLabel={(item) => item.name}
-              getHint={(item) => item.class}
-              value={studentId}
-              onChange={setStudentId}
-              selectedLabel={data?.student}
-              placeholder="Search students..."
-              error={errors.studentId}
-              sortProperty="LastName"
-            />
+          <RemoteSelectField<Student>
+            label="Student"
+            fetcher={searchStudents}
+            getId={(item) => item.studentId}
+            getLabel={(item) => item.name}
+            getHint={(item) => item.class}
+            value={studentId}
+            onChange={setStudentId}
+            selectedLabel={data?.student}
+            placeholder="Search students..."
+            error={errors.studentId}
+            sortProperty="LastName"
+            className="w-full"
+          />
 
-            {resultType === "exam" ? (
-              <RemoteSelectField<Exam>
-                label="Exam"
-                fetcher={searchExams}
-                getId={(item) => item.examId}
-                getLabel={(item) => item.title || item.examId}
-                getHint={(item) =>
-                  [item.subject, item.class].filter(Boolean).join(" · ") || null
-                }
-                value={examId}
-                onChange={setExamId}
-                placeholder="Search exams..."
-                error={errors.examId}
-                sortProperty="ExamDate"
-              />
-            ) : (
-              <RemoteSelectField<Assignment>
-                label="Assignment"
-                fetcher={searchAssignments}
-                getId={(item) => item.assignmentId}
-                getLabel={(item) => item.title || item.assignmentId}
-                getHint={(item) =>
-                  [item.subject, item.class].filter(Boolean).join(" · ") || null
-                }
-                value={assignmentId}
-                onChange={setAssignmentId}
-                placeholder="Search assignments..."
-                error={errors.assignmentId}
-                sortProperty="DueDate"
-              />
-            )}
-          </div>
-        </>
+          {resultType === "exam" ? (
+            <RemoteSelectField<Exam>
+              label="Exam"
+              fetcher={searchExams}
+              getId={(item) => item.examId}
+              getLabel={(item) => item.title || item.examId}
+              getHint={(item) =>
+                [item.subject, item.class].filter(Boolean).join(" · ") || null
+              }
+              value={examId}
+              onChange={setExamId}
+              placeholder="Search exams..."
+              error={errors.examId}
+              sortProperty="ExamDate"
+              className="w-full"
+            />
+          ) : (
+            <RemoteSelectField<Assignment>
+              label="Assignment"
+              fetcher={searchAssignments}
+              getId={(item) => item.assignmentId}
+              getLabel={(item) => item.title || item.assignmentId}
+              getHint={(item) =>
+                [item.subject, item.class].filter(Boolean).join(" · ") || null
+              }
+              value={assignmentId}
+              onChange={setAssignmentId}
+              placeholder="Search assignments..."
+              error={errors.assignmentId}
+              sortProperty="DueDate"
+              className="w-full"
+            />
+          )}
+        </FormSection>
       )}
 
-      <div className="flex justify-between flex-wrap gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500 dark:text-gray-300">
+      <FormSection title="Marks" hint="Score, date and an optional remark">
+        <div className="flex w-full flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
             Score {data?.maxScore ? `(out of ${data.maxScore})` : ""}
+            <span className="ml-0.5 text-red-500">*</span>
           </label>
           <input
             type="number"
@@ -238,48 +265,46 @@ const ResultForm = ({
             min={0}
             value={score}
             onChange={(event) => setScore(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className={fieldClass(!!errors.score)}
           />
-          {errors.score && <p className="text-xs text-red-400">{errors.score}</p>}
+          {errors.score && <p className="text-xs text-red-500">{errors.score}</p>}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Date</label>
+        <div className="flex w-full flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">Date</label>
           <input
             type="date"
             value={resultDate}
             onChange={(event) => setResultDate(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className={fieldClass(false)}
           />
           <p className="text-xs text-gray-400">Defaults to the exam/assignment date.</p>
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/3">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
+        <div className="flex w-full flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">Remark</label>
           <input
             type="text"
             value={remark}
             maxLength={200}
             onChange={(event) => setRemark(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className={fieldClass(false)}
             placeholder="Optional"
           />
         </div>
-      </div>
 
-      <p className="text-xs text-gray-400">
-        The score is checked against the source&apos;s max score, and a student can
-        only have one result per exam or assignment.
-      </p>
+        <p className="text-xs text-gray-400 sm:col-span-2 lg:col-span-3">
+          The score is checked against the source&apos;s max score, and a student can
+          only have one result per exam or assignment.
+        </p>
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting ? (isUpdate ? "Updating..." : "Recording...") : isUpdate ? "Update" : "Record"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isUpdate ? "Save changes" : "Record result"}
+        submittingLabel={isUpdate ? "Saving..." : "Recording..."}
+      />
     </form>
   );
 };

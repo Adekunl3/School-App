@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import InputField from "../InputField";
+import InputField, { fieldClass } from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import { optionalText, requiredText, toApiDate, toDateInput } from "@/lib/formHelpers";
 import { announcementService } from "@/services/school";
@@ -26,10 +27,12 @@ const AnnouncementForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Announcement;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -83,14 +86,28 @@ const AnnouncementForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Post an announcement" : "Update announcement"}
-      </h1>
+  const isCreate = type === "create";
 
-      <div className="flex justify-between flex-wrap gap-4">
-        <InputField label="Title" name="title" register={register} error={errors.title} />
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Post an announcement" : "Update announcement"}
+        subtitle={
+          isCreate
+            ? "Share news with the whole school or a single class. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection title="Audience" hint="Who sees this and when" columns="sm:grid-cols-2">
+        <InputField
+          label="Title"
+          name="title"
+          register={register}
+          error={errors.title}
+          required
+          className="w-full sm:col-span-2"
+        />
         <SelectField
           label="Class"
           name="classId"
@@ -98,6 +115,7 @@ const AnnouncementForm = ({
           error={errors.classId}
           source="classes"
           placeholder="Whole school"
+          className="w-full"
         />
         <InputField
           label="Date"
@@ -105,37 +123,34 @@ const AnnouncementForm = ({
           type="date"
           register={register}
           error={errors.announcementDate}
+          className="w-full"
           inputProps={{ placeholder: "Defaults to today" }}
         />
-      </div>
+      </FormSection>
 
-      <div className="flex flex-col gap-2 w-full">
-        <label className="text-xs text-gray-500 dark:text-gray-300">Message</label>
-        <textarea
-          rows={4}
-          {...register("description")}
-          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          placeholder="What you want people to know"
-        />
-        {errors.description?.message && (
-          <p className="text-xs text-red-400">{errors.description.message.toString()}</p>
-        )}
-      </div>
+      <FormSection title="Message" hint="What you want people to know" columns="sm:grid-cols-1">
+        <div className="flex w-full flex-col gap-1.5">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
+            Message
+          </label>
+          <textarea
+            rows={4}
+            {...register("description")}
+            className={fieldClass(!!errors.description)}
+            placeholder="What you want people to know"
+          />
+          {errors.description?.message && (
+            <p className="text-xs text-red-500">{errors.description.message.toString()}</p>
+          )}
+        </div>
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Posting..."
-            : "Updating..."
-          : type === "create"
-          ? "Post"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Post announcement" : "Save changes"}
+        submittingLabel={isCreate ? "Posting..." : "Saving..."}
+      />
     </form>
   );
 };

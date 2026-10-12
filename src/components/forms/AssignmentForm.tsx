@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import InputField from "../InputField";
+import InputField, { fieldClass } from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import {
   optionalNumber,
@@ -40,10 +41,12 @@ const AssignmentForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Assignment;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -105,18 +108,31 @@ const AssignmentForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new assignment" : "Update assignment"}
-      </h1>
+  const isCreate = type === "create";
 
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Create a new assignment" : "Update assignment"}
+        subtitle={
+          isCreate
+            ? "Describe the assignment and set its dates. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection
+        title="Assignment details"
+        hint="Title, subject, class and teacher"
+        columns="sm:grid-cols-2"
+      >
         <InputField
           label="Title"
           name="title"
           register={register}
           error={errors.title}
+          required
+          className="w-full sm:col-span-2"
         />
         <SelectField
           label="Subject"
@@ -124,6 +140,7 @@ const AssignmentForm = ({
           register={register}
           error={errors.subjectId}
           source="subjects"
+          className="w-full"
         />
         <SelectField
           label="Class"
@@ -131,6 +148,7 @@ const AssignmentForm = ({
           register={register}
           error={errors.classId}
           source="classes"
+          className="w-full"
         />
         <SelectField
           label="Teacher"
@@ -139,17 +157,32 @@ const AssignmentForm = ({
           error={errors.teacherId}
           source="teachers"
           placeholder="Unassigned"
+          className="w-full sm:col-span-2"
         />
-      </div>
+        <div className="flex w-full flex-col gap-1.5 sm:col-span-2">
+          <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
+            Description
+          </label>
+          <textarea
+            rows={3}
+            {...register("description")}
+            className={fieldClass(!!errors.description)}
+            placeholder="What the students need to do"
+          />
+          {errors.description?.message && (
+            <p className="text-xs text-red-500">{errors.description.message.toString()}</p>
+          )}
+        </div>
+      </FormSection>
 
-      <span className="text-xs text-gray-400 font-medium">Dates &amp; marking</span>
-      <div className="flex justify-between flex-wrap gap-4">
+      <FormSection title="Dates & marking" hint="When it starts, when it is due, and the score">
         <InputField
           label="Start Date"
           name="startDate"
           type="date"
           register={register}
           error={errors.startDate}
+          className="w-full"
           inputProps={{ placeholder: "Defaults to today" }}
         />
         <InputField
@@ -158,6 +191,8 @@ const AssignmentForm = ({
           type="date"
           register={register}
           error={errors.dueDate}
+          required
+          className="w-full"
         />
         <InputField
           label="Max Score"
@@ -165,37 +200,17 @@ const AssignmentForm = ({
           type="number"
           register={register}
           error={errors.maxScore}
+          className="w-full"
           inputProps={{ min: 0, step: "0.01", placeholder: "e.g. 20" }}
         />
-      </div>
+      </FormSection>
 
-      <div className="flex flex-col gap-2 w-full">
-        <label className="text-xs text-gray-500 dark:text-gray-300">Description</label>
-        <textarea
-          rows={3}
-          {...register("description")}
-          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          placeholder="What the students need to do"
-        />
-        {errors.description?.message && (
-          <p className="text-xs text-red-400">{errors.description.message.toString()}</p>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create assignment" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

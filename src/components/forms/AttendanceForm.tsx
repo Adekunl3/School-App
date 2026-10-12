@@ -2,7 +2,9 @@
 
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
+import { fieldClass } from "../InputField";
 import RemoteSelectField from "../RemoteSelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError, type ListQuery } from "@/lib/apiClient";
 import { toApiDate, toDateInput } from "@/lib/formHelpers";
 import { attendanceService, studentService } from "@/services/school";
@@ -15,6 +17,8 @@ const todayInput = (): string => {
   return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
 };
 
+const labelClass = "text-xs font-medium text-gray-600 dark:text-gray-300";
+
 /**
  * A register entry for one student on one day.
  *
@@ -25,10 +29,12 @@ const AttendanceForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: Attendance;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const isUpdate = type === "update";
 
@@ -114,16 +120,23 @@ const AttendanceForm = ({
   };
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {isUpdate ? "Update attendance" : "Record attendance"}
-      </h1>
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isUpdate ? "Update attendance" : "Record attendance"}
+        subtitle={
+          isUpdate
+            ? "Change the register entry below and save."
+            : "Mark a student present or absent for a day."
+        }
+      />
 
-      <div className="flex justify-between flex-wrap gap-4">
+      <FormSection title="Student and date" hint="Who and which day" columns="sm:grid-cols-2">
         {isUpdate ? (
-          <div className="flex flex-col gap-2 w-full md:w-1/3">
-            <span className="text-xs text-gray-500 dark:text-gray-300">Student</span>
-            <span className="text-sm">{data?.student || data?.studentId || "-"}</span>
+          <div className="flex w-full flex-col gap-1.5">
+            <span className={labelClass}>Student</span>
+            <span className="text-sm text-gray-900 dark:text-gray-100">
+              {data?.student || data?.studentId || "-"}
+            </span>
             <span className="text-xs text-gray-400">{data?.class || "No class"}</span>
           </div>
         ) : (
@@ -138,27 +151,30 @@ const AttendanceForm = ({
             placeholder="Search students..."
             error={errors.studentId}
             sortProperty="LastName"
+            className="w-full"
           />
         )}
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500 dark:text-gray-300">Date</label>
+        <div className="flex w-full flex-col gap-1.5">
+          <label className={labelClass}>Date</label>
           <input
             type="date"
             value={attendanceDate}
             max={todayInput()}
             onChange={(event) => setAttendanceDate(event.target.value)}
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
+            className={fieldClass(!!errors.attendanceDate)}
           />
           {errors.attendanceDate && (
-            <p className="text-xs text-red-400">{errors.attendanceDate}</p>
+            <p className="text-xs text-red-500">{errors.attendanceDate}</p>
           )}
         </div>
+      </FormSection>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <span className="text-xs text-gray-500 dark:text-gray-300">Status</span>
-          <div className="flex gap-4 text-sm">
-            <label className="flex items-center gap-2 cursor-pointer">
+      <FormSection title="Status" hint="Attendance for the day" columns="sm:grid-cols-2">
+        <div className="flex w-full flex-col gap-2">
+          <span className={labelClass}>Presence</span>
+          <div className="flex gap-4 text-sm text-gray-800 dark:text-gray-200">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="radio"
                 name="presence"
@@ -167,7 +183,7 @@ const AttendanceForm = ({
               />
               Present
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="radio"
                 name="presence"
@@ -179,7 +195,7 @@ const AttendanceForm = ({
           </div>
 
           <label
-            className={`flex items-center gap-2 text-sm ${
+            className={`flex items-center gap-2 text-sm text-gray-800 dark:text-gray-200 ${
               present ? "cursor-pointer" : "opacity-50"
             }`}
           >
@@ -192,35 +208,33 @@ const AttendanceForm = ({
             Arrived late
           </label>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-2 w-full">
-        <label className="text-xs text-gray-500 dark:text-gray-300">Remark</label>
-        <input
-          type="text"
-          value={remark}
-          maxLength={200}
-          onChange={(event) => setRemark(event.target.value)}
-          className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200"
-          placeholder="Optional — e.g. reason for absence"
-        />
-      </div>
+        <div className="flex w-full flex-col gap-1.5">
+          <label className={labelClass}>Remark</label>
+          <input
+            type="text"
+            value={remark}
+            maxLength={200}
+            onChange={(event) => setRemark(event.target.value)}
+            className={fieldClass(false)}
+            placeholder="Optional — e.g. reason for absence"
+          />
+        </div>
 
-      {!isUpdate && (
-        <p className="text-xs text-gray-400">
-          Each student can have only one record per day. If one already exists, edit
-          it instead.
-        </p>
-      )}
+        {!isUpdate && (
+          <p className="text-xs text-gray-400 sm:col-span-2">
+            Each student can have only one record per day. If one already exists, edit
+            it instead.
+          </p>
+        )}
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting ? (isUpdate ? "Updating..." : "Recording...") : isUpdate ? "Update" : "Record"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isUpdate ? "Save changes" : "Record attendance"}
+        submittingLabel={isUpdate ? "Saving..." : "Recording..."}
+      />
     </form>
   );
 };

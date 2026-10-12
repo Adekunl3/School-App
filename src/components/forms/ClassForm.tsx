@@ -7,6 +7,7 @@ import { z } from "zod";
 import toast from "react-hot-toast";
 import InputField from "../InputField";
 import SelectField from "../SelectField";
+import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
 import { optionalInt, optionalText, requiredText } from "@/lib/formHelpers";
 import { invalidateLookups } from "@/hooks/useLookup";
@@ -29,10 +30,12 @@ const ClassForm = ({
   type,
   data,
   onSuccess,
+  onCancel,
 }: {
   type: "create" | "update";
   data?: SchoolClass;
   onSuccess?: () => void;
+  onCancel?: () => void;
 }) => {
   const [submitting, setSubmitting] = useState(false);
 
@@ -92,29 +95,41 @@ const ClassForm = ({
     }
   });
 
-  return (
-    <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create a new class" : "Update class"}
-      </h1>
+  const isCreate = type === "create";
 
-      <div className="flex justify-between flex-wrap gap-4">
+  return (
+    <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+      <FormHeader
+        title={isCreate ? "Add a new class" : "Update class"}
+        subtitle={
+          isCreate
+            ? "Fill in the class details. Fields marked * are required."
+            : "Change the details below and save."
+        }
+      />
+
+      <FormSection
+        title="Class details"
+        hint="Code, grade, capacity and form teacher"
+        columns="sm:grid-cols-2"
+      >
         <InputField
           label="Class Code"
           name="classId"
           register={register}
           error={errors.classId}
-          inputProps={{
-            placeholder: "e.g. 1B",
-            readOnly: type === "update",
-            disabled: type === "update",
-          }}
+          required
+          className="w-full"
+          inputProps={{ placeholder: "e.g. 1B",
+            readOnly: !isCreate,
+            disabled: !isCreate, }}
         />
         <InputField
           label="Display Name"
           name="name"
           register={register}
           error={errors.name}
+          className="w-full"
           inputProps={{ placeholder: "Defaults to the class code" }}
         />
         <InputField
@@ -123,6 +138,7 @@ const ClassForm = ({
           type="number"
           register={register}
           error={errors.grade}
+          className="w-full"
           inputProps={{ min: 1, max: 15 }}
         />
         <InputField
@@ -131,6 +147,7 @@ const ClassForm = ({
           type="number"
           register={register}
           error={errors.capacity}
+          className="w-full"
           inputProps={{ min: 1, max: 200 }}
         />
         <SelectField
@@ -140,32 +157,25 @@ const ClassForm = ({
           error={errors.supervisorId}
           source="teachers"
           placeholder="Unassigned"
+          className="w-full sm:col-span-2"
         />
-      </div>
 
-      {/* The server refuses a capacity below the current roster, so warn before
-          the user submits something that will bounce. */}
-      {type === "update" && data && data.enrolledCount > 0 && (
-        <p className="text-xs text-gray-400">
-          {data.enrolledCount} student{data.enrolledCount === 1 ? "" : "s"} currently
-          assigned — capacity cannot be set below this.
-        </p>
-      )}
+        {/* The server refuses a capacity below the current roster, so warn before
+            the user submits something that will bounce. */}
+        {type === "update" && data && data.enrolledCount > 0 && (
+          <p className="text-xs text-gray-400 sm:col-span-2">
+            {data.enrolledCount} student{data.enrolledCount === 1 ? "" : "s"} currently
+            assigned — capacity cannot be set below this.
+          </p>
+        )}
+      </FormSection>
 
-      <button
-        type="submit"
-        disabled={submitting}
-        aria-busy={submitting}
-        className="bg-blue-400 text-white p-2 rounded-md disabled:opacity-60"
-      >
-        {submitting
-          ? type === "create"
-            ? "Creating..."
-            : "Updating..."
-          : type === "create"
-          ? "Create"
-          : "Update"}
-      </button>
+      <FormFooter
+        onCancel={onCancel}
+        submitting={submitting}
+        submitLabel={isCreate ? "Create class" : "Save changes"}
+        submittingLabel={isCreate ? "Creating..." : "Saving..."}
+      />
     </form>
   );
 };

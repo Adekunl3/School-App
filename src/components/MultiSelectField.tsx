@@ -38,7 +38,7 @@ const MultiSelectField = ({
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-baseline justify-between">
-        <label className="text-xs text-gray-500 dark:text-gray-300">{label}</label>
+        <label className="text-xs font-medium text-gray-600 dark:text-gray-300">{label}</label>
         {value.length > 0 && (
           <span className="text-xs text-gray-400">{value.length} selected</span>
         )}
@@ -47,15 +47,15 @@ const MultiSelectField = ({
       {loading ? (
         <Loader label="Loading..." className="" />
       ) : error ? (
-        <p className="text-xs text-red-400">{error.message}</p>
+        <p className="text-xs text-red-500">{error.message}</p>
       ) : options.length === 0 ? (
         <p className="text-xs text-amber-500">None available yet — create one first.</p>
       ) : (
-        <div className="max-h-40 overflow-y-auto rounded-md ring-[1.5px] ring-gray-300 p-2 flex flex-col gap-1 dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200">
+        <div className="max-h-40 overflow-y-auto rounded-lg border border-gray-300 p-2 flex flex-col gap-1 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
           {options.map((option) => (
             <label
               key={option.id}
-              className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 rounded px-1"
+              className="flex items-center gap-2 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-gray-700 rounded px-1"
             >
               <input
                 type="checkbox"
