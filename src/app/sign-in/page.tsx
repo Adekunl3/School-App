@@ -94,7 +94,7 @@ const SignInPage = () => {
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-gray-900">
       {/* Brand panel (large screens) */}
-      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-12 text-white">
+      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-950 p-12 text-white">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15">
             <Image src="/logo.png" alt="" width={28} height={28} />
