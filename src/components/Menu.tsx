@@ -3,6 +3,7 @@
 import { homeRouteFor, useRole } from "@/hooks/useRole";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const menuItems = [
   {
@@ -151,6 +152,18 @@ const menuItems = [
 
 const Menu = () => {
   const role = useRole();
+  const pathname = usePathname();
+
+  const resolveHref = (href: string) =>
+    href === "home" ? homeRouteFor(role) : href;
+
+  // Longest match wins so "/list/fees/family" doesn't also light up "/list/fees".
+  const activeHref = menuItems
+    .flatMap((group) => group.items)
+    .filter((item) => item.visible.includes(role))
+    .map((item) => resolveHref(item.href))
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
 
   return (
     <div className="mt-4 text-sm">
@@ -161,11 +174,18 @@ const Menu = () => {
           </span>
           {i.items.map((item) => {
             if (item.visible.includes(role)) {
+              const href = resolveHref(item.href);
+              const isActive = href === activeHref;
               return (
                 <Link
-                  href={item.href === "home" ? homeRouteFor(role) : item.href}
+                  href={href}
                   key={item.label}
-                  className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight dark:hover:bg-gray-700 dark:text-gray-300"
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight dark:hover:bg-gray-700 ${
+                    isActive
+                      ? "bg-lamaSkyLight text-gray-800 font-medium dark:bg-gray-700 dark:text-white"
+                      : "text-gray-500 dark:text-gray-300"
+                  }`}
                 >
                   <Image src={item.icon} alt="" width={20} height={20} />
                   <span className="hidden lg:block">{item.label}</span>
