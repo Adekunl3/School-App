@@ -1,123 +1,98 @@
 "use client";
 
-import Image from "next/image";
+import Link from "next/link";
+import { useCallback } from "react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
+  Bar,
+  BarChart,
   CartesianGrid,
-  Tooltip,
   Legend,
   ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
+import { useAsync } from "@/hooks/useAsync";
+import { feeService, formatMoney } from "@/services/fees";
+import type { FeeSummary } from "@/types/school";
+import { Loader } from "@/components/Spinner";
 
-const data = [
-  {
-    name: "Jan",
-    income: 4000,
-    expense: 2400,
-  },
-  {
-    name: "Feb",
-    income: 3000,
-    expense: 1398,
-  },
-  {
-    name: "Mar",
-    income: 2000,
-    expense: 9800,
-  },
-  {
-    name: "Apr",
-    income: 2780,
-    expense: 3908,
-  },
-  {
-    name: "May",
-    income: 1890,
-    expense: 4800,
-  },
-  {
-    name: "Jun",
-    income: 2390,
-    expense: 3800,
-  },
-  {
-    name: "Jul",
-    income: 3490,
-    expense: 4300,
-  },
-  {
-    name: "Aug",
-    income: 3490,
-    expense: 4300,
-  },
-  {
-    name: "Sep",
-    income: 3490,
-    expense: 4300,
-  },
-  {
-    name: "Oct",
-    income: 3490,
-    expense: 4300,
-  },
-  {
-    name: "Nov",
-    income: 3490,
-    expense: 4300,
-  },
-  {
-    name: "Dec",
-    income: 3490,
-    expense: 4300,
-  },
-];
+const compact = new Intl.NumberFormat("en-NG", { notation: "compact", maximumFractionDigits: 1 });
 
+/**
+ * Fees collected against fees still owed, by class, for the latest billed
+ * term. Uses the same palette as the attendance chart so the dashboard reads
+ * as one set.
+ */
 const FinanceChart = () => {
+  const { data, loading, error } = useAsync<FeeSummary>(
+    useCallback(() => feeService.summary(), [])
+  );
+
+  const rows = (data?.byClass ?? []).map((row) => ({
+    name: row.class,
+    collected: row.collected,
+    outstanding: row.outstanding,
+  }));
+
   return (
-    <div className="bg-white rounded-xl w-full h-full p-4  dark:odd:bg-gray-800 dark:even:bg-gray-700">
-      <div className="flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Finance</h1>
-        <Image src="/moreDark.png" alt="" width={20} height={20} />
+    <div className="bg-white rounded-lg p-4 h-full dark:bg-gray-800 flex flex-col">
+      <div className="flex justify-between items-start gap-2">
+        <div>
+          <h1 className="text-lg font-semibold">Fees</h1>
+          {data?.session && (
+            <p className="text-xs text-gray-500 dark:text-gray-300">
+              {data.termName} {data.session} · {formatMoney(data.collected)} of{" "}
+              {formatMoney(data.expected)} collected
+            </p>
+          )}
+        </div>
+        <Link href="/list/fees" className="text-xs text-indigo-600 hover:underline whitespace-nowrap">
+          View fees
+        </Link>
       </div>
-      <ResponsiveContainer width="100%" height="90%">
-        <LineChart
-          width={500}
-          height={300}
-          data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tick={{ fill: "#d1d5db" }}
-            tickLine={false}
-            tickMargin={10}
-          />
-          <YAxis axisLine={false} tick={{ fill: "#d1d5db" }} tickLine={false}  tickMargin={20}/>
-          <Tooltip />
-          <Legend
-            align="center"
-            verticalAlign="top"
-            wrapperStyle={{ paddingTop: "10px", paddingBottom: "30px" }}
-          />
-          <Line
-            type="monotone"
-            dataKey="income"
-            stroke="#C3EBFA"
-            strokeWidth={5}
-          />
-          <Line type="monotone" dataKey="expense" stroke="#CFCEFF" strokeWidth={5}/>
-        </LineChart>
-      </ResponsiveContainer>
+
+      {loading ? (
+        <Loader label="Loading fees..." className="mt-8" />
+      ) : error ? (
+        <p className="mt-8 text-sm text-red-600">{error.message}</p>
+      ) : rows.length === 0 ? (
+        <p className="mt-8 text-sm text-gray-500 dark:text-gray-300">
+          No bills yet. Set up fee items and generate bills on the Fees page.
+        </p>
+      ) : (
+        <div className="flex-1 min-h-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={rows} barSize={20}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ddd" />
+              <XAxis dataKey="name" axisLine={false} tick={{ fill: "#9ca3af" }} tickLine={false} />
+              <YAxis
+                axisLine={false}
+                tick={{ fill: "#9ca3af" }}
+                tickLine={false}
+                tickFormatter={(value: number) => compact.format(value)}
+              />
+              <Tooltip
+                formatter={(value: number) => formatMoney(value)}
+                contentStyle={{ borderRadius: "10px", borderColor: "lightgray" }}
+              />
+              <Legend
+                align="left"
+                verticalAlign="top"
+                wrapperStyle={{ paddingTop: "10px", paddingBottom: "20px" }}
+              />
+              <Bar dataKey="collected" stackId="fees" fill="#FAE27C" legendType="circle" />
+              <Bar
+                dataKey="outstanding"
+                stackId="fees"
+                fill="#C3EBFA"
+                legendType="circle"
+                radius={[10, 10, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 };

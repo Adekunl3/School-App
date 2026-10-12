@@ -1,12 +1,21 @@
-
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
-import { api, TOKEN } from "@/lib/api";
 import toast from "react-hot-toast";
-import { parseUserData, storeUserData } from "@/utils/userUtils";
+import { AuthError, login } from "@/lib/authService";
+import { DEFAULT_LANDING_ROUTE } from "@/lib/config";
+import {
+  consumePersistentToast,
+  getLastPath,
+  hasSession,
+  saveTokens,
+  saveUser,
+  setLocked,
+  touchActivity,
+} from "@/lib/authStorage";
 
 const SignInPage = () => {
   const router = useRouter();
@@ -14,141 +23,134 @@ const SignInPage = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const[persistToast, setPersistToast]= useState(false);
 
-//   const showPersistentToast = (message: string) => {
-//   // Store first, then show
-//   localStorage.setItem('persistentToast', message);
-//   toast.error(message, { duration: 8000 });
-// };
-
-const showPersistentToast = (message: string) => {
-  localStorage.setItem("persistentToast", message);
-  toast.error(message, { duration: 8000 });
-};
-
-useEffect(() => {
-  const savedToast = localStorage.getItem("persistentToast");
-  if (savedToast) {
-    toast.error(savedToast, { duration: 8000 });
-    localStorage.removeItem("persistentToast");
-  }
-}, []);
-
-
-  // Auth check - runs once on mount
+  // Surface whatever ended the previous session (expiry, idle timeout, ...).
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      router.replace("/admin");
+    const message = consumePersistentToast();
+    if (message) {
+      toast.error(message, { duration: 6000 });
+    }
+  }, []);
+
+  // Already signed in? Go back to the last route so a locked session resumes
+  // on the page the user left, with the lock screen over it.
+  useEffect(() => {
+    if (hasSession()) {
+      router.replace(getLastPath() || DEFAULT_LANDING_ROUTE);
     } else {
       setCheckingAuth(false);
     }
-  },
-    [router]
-  //[]
-  );
-
-  
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous states
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
 
-    // Validation
-    if (!username.trim() || !password.trim()) {
-      toast.error("Please enter both username and password.", {
-        duration: 5000,
-      });
+    if (!trimmedUsername || !trimmedPassword) {
+      toast.error("Please enter both username and password.", { duration: 5000 });
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await api.post(`/Login/${TOKEN}`, { 
-        username: username.trim(), 
-        password: password.trim() 
-      });
+      const result = await login(trimmedUsername, trimmedPassword);
 
-      // Check API response status
-      if (response.data.message === "Success") {
-        const { jwtToken, refreshToken, userId, userName } = response.data;
+      // jwtToken and refreshToken are distinct values — storing one as both
+      // is what previously broke the refresh flow.
+      saveTokens(result);
+      saveUser(trimmedUsername, result.user);
+      setLocked(false);
+      touchActivity();
 
-        // Store tokens
-        localStorage.setItem("accessToken", jwtToken);
-        localStorage.setItem("refreshToken", refreshToken);
-
-      const userData = parseUserData(response.data);
-      storeUserData(userData);
-      
-      // Also store the raw userId for compatibility
-      localStorage.setItem("userId", response.data.userId);
-      
-
-        toast.success("Login successful! Redirecting...", {
-          duration: 3000,
-        });
-
-        // Redirect after short delay
-        setTimeout(() => {
-          router.replace("/admin");
-        }, 1500);
-
-      } else {
-        // API returned failure with custom message
-        const apiErrorMessage = response.data.message || "Login failed. Please try again.";
-        toast.error(apiErrorMessage, {
-          duration: 8000,
-        });
-        setLoading(false); // Reset loading state
-      }
-
-    } catch (err: any) {
-      // Extract specific error message from API response
-      let errorMessage = "Invalid username or password. Please try again.";
-      
-      if (err.response?.data?.message) {
-        // Use API-provided error message
-        errorMessage = err.response.data.message;
-      } else if (err.code === "NETWORK_ERROR") {
-        errorMessage = "Network error. Please check your connection.";
-      } else if (err.response?.status >= 500) {
-        errorMessage = "Server error. Please try again later.";
-      }
-
- showPersistentToast(errorMessage);
-      
-      setLoading(false); 
+      toast.success("Login successful! Redirecting...", { duration: 2000 });
+      router.replace(getLastPath() || DEFAULT_LANDING_ROUTE);
+    } catch (err) {
+      const message =
+        err instanceof AuthError
+          ? err.message
+          : "Invalid username or password. Please try again.";
+      toast.error(message, { duration: 6000 });
+      setPassword("");
+      setLoading(false);
     }
   };
 
-  // Loading state during auth check
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-600">Checking authentication...</p>
+          <p className="mt-4 text-slate-600 dark:text-slate-300">
+            Checking authentication...
+          </p>
         </div>
       </div>
     );
   }
 
-  // if(persistToast)
-  //     toast.error("Error Logging In", {
-  //       duration: 8000, // Long enough to survive re-renders
-  //     });
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-gray-900">
+      {/* Brand panel (large screens) */}
+      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 dark:from-gray-900 dark:via-indigo-950 dark:to-gray-950 p-12 text-white">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15">
+            <Image src="/logo.png" alt="" width={28} height={28} />
+          </span>
+          <span className="text-xl font-bold tracking-tight">SchooL App</span>
+        </div>
+
+        <div>
+          <h2 className="text-4xl font-bold leading-tight">
+            School management,
+            <br />
+            made simple.
+          </h2>
+          <p className="mt-4 max-w-md text-indigo-100">
+            Students, teachers, classes, exams and fees &mdash; everything your
+            school runs on, in one place.
+          </p>
+
+          <ul className="mt-8 space-y-3 text-sm text-indigo-50">
+            {[
+              "Track attendance, results and assignments",
+              "Manage fees, payments and family balances",
+              "Keep staff, students and parents connected",
+            ].map((point) => (
+              <li key={point} className="flex items-center gap-3">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-xs">
+                  &#10003;
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="text-xs text-indigo-200">
+          &copy; {new Date().getFullYear()} Development Solutions
+        </p>
+      </aside>
+
+      {/* Form panel */}
+      <main className="flex flex-1 flex-col items-center justify-center p-4">
+        {/* Brand header (small screens) */}
+        <div className="mb-6 flex flex-col items-center text-center lg:hidden">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600">
+            <Image src="/logo.png" alt="" width={34} height={34} />
+          </span>
+          <span className="mt-3 text-2xl font-bold">SchooL App</span>
+          <span className="text-sm text-slate-500 dark:text-gray-300">
+            School management, made simple.
+          </span>
+        </div>
+
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
         <h1 className="text-2xl font-semibold mb-2">Sign in to your account</h1>
-        <p className="text-sm text-slate-500 mb-6">
-          Demo sign-in — use any credentials to continue.
+        <p className="text-sm text-slate-500 mb-6 dark:text-gray-300">
+          Use your PowerSoft credentials to continue.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -158,9 +160,10 @@ useEffect(() => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
               placeholder="Enter your username"
               aria-label="username"
+              autoComplete="username"
               disabled={loading}
             />
           </label>
@@ -171,9 +174,10 @@ useEffect(() => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="mt-1 block w-full rounded-md border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
               placeholder="Enter your password"
               aria-label="password"
+              autoComplete="current-password"
               disabled={loading}
             />
           </label>
@@ -183,8 +187,8 @@ useEffect(() => {
               <input type="checkbox" className="mr-2" disabled={loading} />
               Remember me
             </label>
-            <Link 
-              href="#" 
+            <Link
+              href="#"
               className="text-sm text-indigo-600 hover:underline disabled:opacity-50"
               onClick={(e) => loading && e.preventDefault()}
             >
@@ -208,28 +212,20 @@ useEffect(() => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-500">
+        <div className="mt-6 text-center text-sm text-slate-500 dark:text-gray-300">
           <span>Don&apos;t have an account? </span>
-          <Link 
-            href="#" 
+          <Link
+            href="#"
             className="text-indigo-600 hover:underline"
             onClick={(e) => loading && e.preventDefault()}
           >
             Sign up
           </Link>
         </div>
-
-        <div className="mt-6 text-xs text-slate-400 text-center">
-          <strong>Demo credentials:</strong> Use any username and password
-        </div>
       </div>
+      </main>
     </div>
   );
 };
 
 export default SignInPage;
-
-
-
-
-
