@@ -8,7 +8,7 @@ import RemoteSelectField from "@/components/RemoteSelectField";
 import { useAsync } from "@/hooks/useAsync";
 import { useIsAdmin } from "@/hooks/useRole";
 import { ApiError, type ListQuery } from "@/lib/apiClient";
-import { formatDate, toApiDate } from "@/lib/formHelpers";
+import { formatDate, toApiDate, todayInput } from "@/lib/formHelpers";
 import { PAYMENT_METHODS, STATUS_STYLES, feeService, formatMoney } from "@/services/fees";
 import { parentService } from "@/services/school";
 import type { FamilyFees, FamilyPaymentResult, Parent, PaymentMethod } from "@/types/school";
@@ -16,11 +16,6 @@ import { Loader } from "@/components/Spinner";
 import MoneyInput from "@/components/MoneyInput";
 
 const inputClass = "ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full dark:ring-gray-600 dark:bg-gray-800 dark:text-gray-200";
-
-const todayInput = (): string => {
-  const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
-};
 
 /**
  * One payment from a parent covering several children. The server applies it

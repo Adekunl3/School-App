@@ -6,7 +6,7 @@ import RemoteSelectField from "../RemoteSelectField";
 import { fieldClass } from "../InputField";
 import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError, type ListQuery } from "@/lib/apiClient";
-import { toApiDate, toDateInput } from "@/lib/formHelpers";
+import { toApiDate, toDateInput, todayInput } from "@/lib/formHelpers";
 import {
   assignmentService,
   examService,
@@ -77,6 +77,10 @@ const ResultForm = ({
       if (resultType === "assignment" && !assignmentId) {
         next.assignmentId = "Select an assignment.";
       }
+    }
+
+    if (resultDate && resultDate > todayInput()) {
+      next.resultDate = "Result date cannot be in the future.";
     }
 
     const parsedScore = Number(score);
@@ -275,9 +279,11 @@ const ResultForm = ({
           <input
             type="date"
             value={resultDate}
+            max={todayInput()}
             onChange={(event) => setResultDate(event.target.value)}
-            className={fieldClass(false)}
+            className={fieldClass(!!errors.resultDate)}
           />
+          {errors.resultDate && <p className="text-xs text-red-500">{errors.resultDate}</p>}
           <p className="text-xs text-gray-400">Defaults to the exam/assignment date.</p>
         </div>
 

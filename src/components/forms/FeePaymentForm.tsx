@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import RemoteSelectField from "../RemoteSelectField";
 import { ApiError, type ListQuery } from "@/lib/apiClient";
-import { toApiDate } from "@/lib/formHelpers";
+import { toApiDate, todayInput } from "@/lib/formHelpers";
 import { PAYMENT_METHODS, feeService, formatMoney } from "@/services/fees";
 import { studentService } from "@/services/school";
 import type { FeeBill, PaymentMethod, Student } from "@/types/school";
@@ -15,11 +15,6 @@ import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 const labelClass = "text-xs font-medium text-gray-600 dark:text-gray-300";
 const wrapClass = "flex w-full flex-col gap-1.5";
 const errClass = "text-xs text-red-500";
-
-const todayInput = (): string => {
-  const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
-};
 
 /**
  * Records money against one bill. Opened from a bill row it is fixed to that

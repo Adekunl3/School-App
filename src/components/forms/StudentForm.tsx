@@ -9,6 +9,7 @@ import InputField, { fieldClass } from "../InputField";
 import SelectField from "../SelectField";
 import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError } from "@/lib/apiClient";
+import { optionalPastDate, todayInput } from "@/lib/formHelpers";
 import { createStudent, updateStudent } from "@/services/students";
 import type { Student, StudentCreateInput } from "@/types/school";
 
@@ -44,9 +45,9 @@ const schema = z.object({
   classId: optionalText(36),
   address: optionalText(200),
   sex: z.enum(["", "male", "female"]).optional(),
-  dateOfBirth: optionalText(30),
+  dateOfBirth: optionalPastDate("Date of birth"),
   bloodType: optionalText(5),
-  admissionDate: optionalText(30),
+  admissionDate: optionalPastDate("Admission date"),
   parentId: optionalText(36),
   photo: z
     .union([z.literal(""), z.string().url({ message: "Enter a valid photo URL" })])
@@ -202,6 +203,7 @@ const StudentForm = ({
           register={register}
           error={errors.admissionDate}
           className="w-full"
+          inputProps={{ max: todayInput() }}
         />
       </FormSection>
 
@@ -236,6 +238,7 @@ const StudentForm = ({
           register={register}
           error={errors.dateOfBirth}
           className="w-full"
+          inputProps={{ max: todayInput() }}
         />
         <div className="flex w-full flex-col gap-1.5">
           <label className="text-xs font-medium text-gray-600 dark:text-gray-300">

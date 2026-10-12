@@ -6,17 +6,11 @@ import { fieldClass } from "../InputField";
 import RemoteSelectField from "../RemoteSelectField";
 import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import { ApiError, type ListQuery } from "@/lib/apiClient";
-import { toApiDate, toDateInput } from "@/lib/formHelpers";
+import { toApiDate, toDateInput, todayInput } from "@/lib/formHelpers";
 import { attendanceService, studentService } from "@/services/school";
 import type { Attendance, AttendanceCreateInput, Student } from "@/types/school";
 
 /** Today, as yyyy-MM-dd in the viewer's own timezone. */
-const todayInput = (): string => {
-  const now = new Date();
-  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
-  return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
-};
-
 const labelClass = "text-xs font-medium text-gray-600 dark:text-gray-300";
 
 /**

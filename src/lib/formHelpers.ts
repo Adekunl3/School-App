@@ -85,6 +85,29 @@ export const optionalTime = z
   .optional()
   .transform((value) => (value ? value : undefined));
 
+/** Today as yyyy-MM-dd in the user's local timezone (what `max` on a date input expects). */
+export const todayInput = (): string => {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
+    .toISOString()
+    .slice(0, 10);
+};
+
+/**
+ * Optional date (yyyy-MM-dd) that may not be in the future - birth dates, hire
+ * and admission dates. The input's `max` stops the picker; this catches typed
+ * or pasted values. Evaluated on every validation, so "today" never goes stale.
+ */
+export const optionalPastDate = (label: string) =>
+  z
+    .string()
+    .max(30)
+    .optional()
+    .refine((value) => !value || value <= todayInput(), {
+      message: `${label} cannot be in the future`,
+    })
+    .transform((value) => (value?.trim() ? value.trim() : undefined));
+
 // ----------------------------------------------------------------- converters
 
 /** yyyy-MM-dd for `<input type="date">`. */

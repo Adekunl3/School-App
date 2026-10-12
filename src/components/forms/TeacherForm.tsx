@@ -11,10 +11,12 @@ import { FormFooter, FormHeader, FormSection } from "../FormLayout";
 import {
   optionalEmail,
   optionalText,
+  optionalPastDate,
   optionalUrl,
   requiredText,
   toApiDate,
   toDateInput,
+  todayInput,
 } from "@/lib/formHelpers";
 import { invalidateLookups } from "@/hooks/useLookup";
 import { teacherService } from "@/services/school";
@@ -31,9 +33,9 @@ const schema = z.object({
   phone: optionalText(20),
   address: optionalText(200),
   sex: z.enum(["", "male", "female"]).optional(),
-  dateOfBirth: optionalText(30),
+  dateOfBirth: optionalPastDate("Date of birth"),
   bloodType: optionalText(5),
-  hireDate: optionalText(30),
+  hireDate: optionalPastDate("Hire date"),
   photo: optionalUrl,
 });
 
@@ -167,6 +169,7 @@ const TeacherForm = ({
           register={register}
           error={errors.hireDate}
           className="w-full"
+          inputProps={{ max: todayInput() }}
         />
       </FormSection>
 
@@ -201,6 +204,7 @@ const TeacherForm = ({
           register={register}
           error={errors.dateOfBirth}
           className="w-full"
+          inputProps={{ max: todayInput() }}
         />
 
         <div className="flex w-full flex-col gap-1.5">
