@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { AuthError, login } from "@/lib/authService";
@@ -91,7 +92,61 @@ const SignInPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-gray-900">
+      {/* Brand panel (large screens) */}
+      <aside className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-12 text-white">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15">
+            <Image src="/logo.png" alt="" width={28} height={28} />
+          </span>
+          <span className="text-xl font-bold tracking-tight">SchooL App</span>
+        </div>
+
+        <div>
+          <h2 className="text-4xl font-bold leading-tight">
+            School management,
+            <br />
+            made simple.
+          </h2>
+          <p className="mt-4 max-w-md text-indigo-100">
+            Students, teachers, classes, exams and fees &mdash; everything your
+            school runs on, in one place.
+          </p>
+
+          <ul className="mt-8 space-y-3 text-sm text-indigo-50">
+            {[
+              "Track attendance, results and assignments",
+              "Manage fees, payments and family balances",
+              "Keep staff, students and parents connected",
+            ].map((point) => (
+              <li key={point} className="flex items-center gap-3">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-xs">
+                  &#10003;
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="text-xs text-indigo-200">
+          &copy; {new Date().getFullYear()} Development Solutions
+        </p>
+      </aside>
+
+      {/* Form panel */}
+      <main className="flex flex-1 flex-col items-center justify-center p-4">
+        {/* Brand header (small screens) */}
+        <div className="mb-6 flex flex-col items-center text-center lg:hidden">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600">
+            <Image src="/logo.png" alt="" width={34} height={34} />
+          </span>
+          <span className="mt-3 text-2xl font-bold">SchooL App</span>
+          <span className="text-sm text-slate-500 dark:text-gray-300">
+            School management, made simple.
+          </span>
+        </div>
+
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-6 dark:bg-gray-800">
         <h1 className="text-2xl font-semibold mb-2">Sign in to your account</h1>
         <p className="text-sm text-slate-500 mb-6 dark:text-gray-300">
@@ -168,6 +223,7 @@ const SignInPage = () => {
           </Link>
         </div>
       </div>
+      </main>
     </div>
   );
 };
